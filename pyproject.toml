@@ -1,0 +1,29 @@
+[project]
+name = "yandexai-hackathon"
+version = "0.1.0"
+description = "Reddit scam/trust detection – filtering + document building + embeddings pipeline"
+requires-python = ">=3.10"
+
+dependencies = [
+    "pydantic>=2.7,<3.0",
+    "pandas>=2.1,<3.0",
+    "numpy>=1.26,<2.0",
+    "tqdm>=4.66,<5.0",
+    "orjson>=3.10,<4.0",
+    "datasets>=3.0,<4.0",  # for streaming large Reddit datasets if needed
+    "faiss-cpu>=1.8,<2.0",
+    "sentence-transformers>=3.0,<4.0",
+    "pyyaml>=6.0,<7.0",
+]
+
+[project.optional-dependencies]
+ dev = [
+    "ipykernel",
+    "black",
+    "ruff",
+    "pytest",
+ ]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
