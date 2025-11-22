@@ -312,7 +312,7 @@
     </div>
 
     <footer class="footer">
-      <p>&copy; 2025 The Sthrokaders | AI NATION Hackathon by Yandex & Repute</p>
+      <p>&copy; 2025 The Sthrokaders | AI NATION Hackathon by Yandex & Reputeo</p>
     </footer>
   </div>
 </template>
@@ -1461,6 +1461,206 @@ export default {
 .risk-score-card,
 .post-card {
   animation: fadeInUp 0.6s ease-out;
+}
+
+/* Additional Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .stats {
+    padding: 1rem;
+  }
+
+  .header-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .stats h1 {
+    font-size: 1.8rem;
+    word-break: break-word;
+  }
+
+  .search-query {
+    display: block;
+    margin-top: 0.5rem;
+  }
+
+  .intro-text {
+    font-size: 0.9rem;
+  }
+
+  .metrics-grid {
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .metric-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .metric-icon {
+    font-size: 2rem;
+  }
+
+  .metric-value {
+    font-size: 2rem;
+  }
+
+  .metric-label {
+    font-size: 0.8rem;
+  }
+
+  .external-api-section {
+    padding: 1.5rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .external-api-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .api-results-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .api-card {
+    padding: 1.2rem;
+  }
+
+  .technical-checks-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+
+  .technical-checks-section h3 {
+    font-size: 1.2rem;
+  }
+
+  .checks-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .check-item {
+    padding: 1rem;
+  }
+
+  .layout-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .sentiment-visual-section,
+  .indicators-section,
+  .risk-section,
+  .chart-section,
+  .recommendations-compact,
+  .risk-score-card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sentiment-visual-section h2,
+  .risk-section h2,
+  .chart-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .indicator-card {
+    padding: 1.5rem;
+  }
+
+  .indicator-card h3 {
+    font-size: 1rem;
+  }
+
+  .risk-score-value {
+    font-size: 3rem;
+  }
+
+  .top-posts-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .reddit-posts {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .post-card {
+    padding: 1.5rem;
+  }
+
+  .post-card h3 {
+    font-size: 1.1rem;
+    padding-right: 50px;
+  }
+
+  .post-rank {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .comment {
+    padding-left: 3.5rem;
+    padding: 1rem;
+    padding-left: 3.5rem;
+  }
+
+  .comment-score-badge {
+    width: 35px;
+    height: 35px;
+    font-size: 0.8rem;
+  }
+
+  .footer {
+    margin-top: 3rem;
+    padding: 1.5rem 0;
+  }
+
+  .footer p {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats {
+    padding: 0.75rem;
+  }
+
+  .stats h1 {
+    font-size: 1.5rem;
+  }
+
+  .metric-card {
+    padding: 1.2rem 0.8rem;
+  }
+
+  .metric-value {
+    font-size: 1.8rem;
+  }
+
+  .api-card,
+  .check-item,
+  .post-card {
+    padding: 1rem;
+  }
+
+  .post-card h3 {
+    font-size: 1rem;
+  }
+
+  .sentiment-visual-section,
+  .risk-section,
+  .chart-section {
+    padding: 1.2rem;
+  }
 }
 </style>
 

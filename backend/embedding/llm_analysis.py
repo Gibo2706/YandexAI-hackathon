@@ -3,6 +3,7 @@ import json
 from openai import OpenAI
 from typing import List, Dict, Any
 from dotenv import load_dotenv
+from .preprocessing import preprocess_for_analysis
 
 load_dotenv()
 
@@ -87,36 +88,70 @@ def prepare_analysis_context(query: str, search_results: List[Dict[str, Any]]) -
     return context
 
 
-def analyze_with_grok(query: str, search_results: List[Dict[str, Any]]) -> Dict[str, Any]:
-
-    context = prepare_analysis_context(query, search_results)
+def analyze_with_grok(
+    query: str, 
+    search_results: List[Dict[str, Any]], 
+    use_preprocessing: bool = True,
+    additional_context: str = None
+) -> Dict[str, Any]:
+    """
+    Analizira Reddit diskusije sa Grok LLM-om.
     
-    system_prompt = """You are an expert fraud detection analyst analyzing Reddit discussions.
+    Args:
+        query: User query
+        search_results: Lista Reddit diskusija
+        use_preprocessing: Ako True, koristi advanced preprocessing (default: True)
+        additional_context: Extra kontekst (npr. HTML analysis) koji se dodaje uz Reddit
+    """
+    
+    # PREPROCESSING: Obogati podatke pre slanja LLM-u
+    if use_preprocessing:
+        preprocessed = preprocess_for_analysis(query, search_results)
+        context = preprocessed['enriched_context']
+        preprocessing_stats = preprocessed['preprocessed_data']['aggregate_stats']
+    else:
+        # Legacy mode (bez preprocessinga)
+        context = prepare_analysis_context(query, search_results)
+        preprocessing_stats = None
+    
+    # Dodaj additional_context ako postoji (npr. HTML keyword findings)
+    if additional_context:
+        context = additional_context + context
+    
+    system_prompt = """You are an expert fraud detection analyst analyzing Reddit discussions with PREPROCESSED data.
 
 Your task:
-1. Analyze Reddit threads (including comment debates via parent_id structure)
-2. Detect scams, fraud, and suspicious activities
-3. Consider comment thread dynamics (debates, disagreements, consensus)
-4. Weight evidence by upvotes and reply structure
-5. Provide actionable risk assessment
+1. Analyze PREPROCESSED Reddit threads with enrichment data (user credibility, thread quality, scam mentions)
+2. Detect scams, fraud, and suspicious activities using PROVIDED statistics
+3. Consider comment thread dynamics AND aggregate community sentiment
+4. Weight evidence by:
+   - Discussion credibility scores
+   - Post quality metrics
+   - Community consensus levels
+   - Direct scam mention counts
+   - Keyword analysis results
+5. Provide actionable risk assessment based on MULTIPLE data sources
+6. If WEBSITE HTML CONTEXT is provided at the top, consider it alongside Reddit data
 
 Return JSON with:
 {
   "scam_score": 0-100 (0=legitimate, 100=definite scam),
   "confidence": 0-100 (how certain are you based on evidence quality),
-  "summary": "2-3 sentence overview",
+  "summary": "2-3 sentence overview incorporating preprocessing insights",
   "red_flags": ["warning sign 1", "warning sign 2", ...],
   "green_flags": ["positive indicator 1", ...],
   "key_points": ["important finding 1", "important finding 2", ...],
-  "recommendation": "AVOID/CAUTION/INVESTIGATE/SAFE",
+  "recommendation": "AVOID/HIGH_CAUTION/INVESTIGATE/LOW_RISK/LIKELY_SAFE",
   "debate_summary": "summary of disagreements in threads",
-  "reasoning": "detailed explanation of your assessment"
+  "reasoning": "detailed explanation using preprocessing stats, credibility scores, and keyword analysis"
 }
 
-Consider:
-- High upvotes on warnings = strong signal
-- Debate in replies = controversy (investigate further)
-- Consensus across multiple threads = reliable
+IMPORTANT:
+- Use AGGREGATE STATISTICS provided at the top (discussion credibility, scam mentions, consensus)
+- Trust high-credibility discussions more than low-credibility ones
+- Consider keyword risk scores in your assessment
+- Community consensus (strong_agreement vs controversial) is a KEY signal
+- If HTML context shows critical red flags, weight that heavily
 - Recent vs old discussions
 - Subreddit reputation (r/scams vs r/investing)
 """
@@ -125,8 +160,11 @@ Consider:
         # Proceni veličinu konteksta (približno 4 chars = 1 token)
         estimated_tokens = len(context) / 4
         
+        # LIMIT: Groq API ima ~8K token context window, ostavi marginu
+        MAX_TOKENS = 6000  # Safe limit sa marginom za response
+        
         # Ako je kontekst prevelik, podeli na 2 dela i analiziraj odvojeno
-        if estimated_tokens > 10000:  # Ostavi marginu
+        if estimated_tokens > MAX_TOKENS:
             mid_point = len(search_results) // 2
             
             # Analiza prvog dela
@@ -134,7 +172,7 @@ Consider:
             response1 = grok_client.chat.completions.create(
                 model=GROK_MODEL,
                 messages=[
-                    {"role": "system", "content": system_prompt + "\n\nNote: This is PART 1 of 2. Analyze these discussions."},
+                    {"role": "system", "content": system_prompt + "\n\nNote: This is PART 1 of 2. Analyze these discussions and provide preliminary findings."},
                     {"role": "user", "content": context_part1}
                 ],
                 temperature=0.3,
@@ -142,32 +180,38 @@ Consider:
             )
             result1 = json.loads(response1.choices[0].message.content)
             
-            # Analiza drugog dela
+            # Analiza drugog dela SA KONTEKSTOM iz Part 1
+            part1_summary = f"""
+PREVIOUS ANALYSIS (PART 1 - first {mid_point} discussions):
+- Scam Score: {result1.get('scam_score', 0)}/100
+- Confidence: {result1.get('confidence', 0)}/100
+- Key Red Flags: {', '.join(result1.get('red_flags', [])[:5])}
+- Key Green Flags: {', '.join(result1.get('green_flags', [])[:5])}
+- Preliminary Verdict: {result1.get('recommendation', 'INVESTIGATE')}
+- Summary: {result1.get('summary', '')}
+
+Now analyze PART 2 and provide a FINAL assessment considering both parts:
+"""
+            
             context_part2 = prepare_analysis_context(query, search_results[mid_point:])
             response2 = grok_client.chat.completions.create(
                 model=GROK_MODEL,
                 messages=[
-                    {"role": "system", "content": system_prompt + "\n\nNote: This is PART 2 of 2. Analyze these discussions."},
-                    {"role": "user", "content": context_part2}
+                    {"role": "system", "content": system_prompt + "\n\nNote: This is PART 2 of 2. You have context from Part 1. Provide FINAL analysis combining both parts."},
+                    {"role": "user", "content": part1_summary + "\n" + context_part2}
                 ],
                 temperature=0.3,
                 response_format={"type": "json_object"} 
             )
             result2 = json.loads(response2.choices[0].message.content)
             
-            # Kombinuj rezultate
-            combined_result = {
-                "scam_score": int((result1.get("scam_score", 0) + result2.get("scam_score", 0)) / 2),
-                "confidence": int((result1.get("confidence", 0) + result2.get("confidence", 0)) / 2),
-                "summary": f"{result1.get('summary', '')} {result2.get('summary', '')}",
-                "red_flags": list(set(result1.get("red_flags", []) + result2.get("red_flags", []))),
-                "green_flags": list(set(result1.get("green_flags", []) + result2.get("green_flags", []))),
-                "key_points": result1.get("key_points", []) + result2.get("key_points", []),
-                "recommendation": result1.get("recommendation", "INVESTIGATE"),
-                "debate_summary": f"Part 1: {result1.get('debate_summary', '')} | Part 2: {result2.get('debate_summary', '')}",
-                "reasoning": f"[PART 1] {result1.get('reasoning', '')} [PART 2] {result2.get('reasoning', '')}"
-            }
-            return combined_result
+            # Vrati result2 kao finalni (jer on već kombinuje obe analize)
+            # Ali dodaj metadata da se zna da je bilo split
+            result2['was_split_analysis'] = True
+            result2['part1_score'] = result1.get('scam_score', 0)
+            result2['part2_score'] = result2.get('scam_score', 0)
+            
+            return result2
         
         # Ako je kontekst OK veličine, uradi normalnu analizu
         response = grok_client.chat.completions.create(
@@ -181,6 +225,16 @@ Consider:
         )
         
         result = json.loads(response.choices[0].message.content)
+        
+        # Dodaj preprocessing stats u rezultat (ako postoje)
+        if preprocessing_stats:
+            result['preprocessing_insights'] = {
+                "avg_discussion_credibility": preprocessing_stats.get('avg_discussion_credibility'),
+                "total_scam_mentions": preprocessing_stats['scam_indicators']['total_scam_mentions'],
+                "community_consensus": preprocessing_stats['consensus']['overall'],
+                "keyword_risk_score": preprocessing_stats['keyword_analysis']['keyword_score']
+            }
+        
         return result
     
     except Exception as e:
