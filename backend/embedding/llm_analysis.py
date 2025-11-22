@@ -3,6 +3,7 @@ import json
 from openai import OpenAI
 from typing import List, Dict, Any
 from dotenv import load_dotenv
+from .preprocessing import preprocess_for_analysis
 
 load_dotenv()
 
@@ -87,36 +88,58 @@ def prepare_analysis_context(query: str, search_results: List[Dict[str, Any]]) -
     return context
 
 
-def analyze_with_grok(query: str, search_results: List[Dict[str, Any]]) -> Dict[str, Any]:
-
-    context = prepare_analysis_context(query, search_results)
+def analyze_with_grok(query: str, search_results: List[Dict[str, Any]], use_preprocessing: bool = True) -> Dict[str, Any]:
+    """
+    Analizira Reddit diskusije sa Grok LLM-om.
     
-    system_prompt = """You are an expert fraud detection analyst analyzing Reddit discussions.
+    Args:
+        query: User query
+        search_results: Lista Reddit diskusija
+        use_preprocessing: Ako True, koristi advanced preprocessing (default: True)
+    """
+    
+    # PREPROCESSING: Obogati podatke pre slanja LLM-u
+    if use_preprocessing:
+        preprocessed = preprocess_for_analysis(query, search_results)
+        context = preprocessed['enriched_context']
+        preprocessing_stats = preprocessed['preprocessed_data']['aggregate_stats']
+    else:
+        # Legacy mode (bez preprocessinga)
+        context = prepare_analysis_context(query, search_results)
+        preprocessing_stats = None
+    
+    system_prompt = """You are an expert fraud detection analyst analyzing Reddit discussions with PREPROCESSED data.
 
 Your task:
-1. Analyze Reddit threads (including comment debates via parent_id structure)
-2. Detect scams, fraud, and suspicious activities
-3. Consider comment thread dynamics (debates, disagreements, consensus)
-4. Weight evidence by upvotes and reply structure
-5. Provide actionable risk assessment
+1. Analyze PREPROCESSED Reddit threads with enrichment data (user credibility, thread quality, scam mentions)
+2. Detect scams, fraud, and suspicious activities using PROVIDED statistics
+3. Consider comment thread dynamics AND aggregate community sentiment
+4. Weight evidence by:
+   - Discussion credibility scores
+   - Post quality metrics
+   - Community consensus levels
+   - Direct scam mention counts
+   - Keyword analysis results
+5. Provide actionable risk assessment based on MULTIPLE data sources
 
 Return JSON with:
 {
   "scam_score": 0-100 (0=legitimate, 100=definite scam),
   "confidence": 0-100 (how certain are you based on evidence quality),
-  "summary": "2-3 sentence overview",
+  "summary": "2-3 sentence overview incorporating preprocessing insights",
   "red_flags": ["warning sign 1", "warning sign 2", ...],
   "green_flags": ["positive indicator 1", ...],
   "key_points": ["important finding 1", "important finding 2", ...],
   "recommendation": "AVOID/CAUTION/INVESTIGATE/SAFE",
   "debate_summary": "summary of disagreements in threads",
-  "reasoning": "detailed explanation of your assessment"
+  "reasoning": "detailed explanation using preprocessing stats, credibility scores, and keyword analysis"
 }
 
-Consider:
-- High upvotes on warnings = strong signal
-- Debate in replies = controversy (investigate further)
-- Consensus across multiple threads = reliable
+IMPORTANT:
+- Use AGGREGATE STATISTICS provided at the top (discussion credibility, scam mentions, consensus)
+- Trust high-credibility discussions more than low-credibility ones
+- Consider keyword risk scores in your assessment
+- Community consensus (strong_agreement vs controversial) is a KEY signal
 - Recent vs old discussions
 - Subreddit reputation (r/scams vs r/investing)
 """
@@ -181,6 +204,16 @@ Consider:
         )
         
         result = json.loads(response.choices[0].message.content)
+        
+        # Dodaj preprocessing stats u rezultat (ako postoje)
+        if preprocessing_stats:
+            result['preprocessing_insights'] = {
+                "avg_discussion_credibility": preprocessing_stats.get('avg_discussion_credibility'),
+                "total_scam_mentions": preprocessing_stats['scam_indicators']['total_scam_mentions'],
+                "community_consensus": preprocessing_stats['consensus']['overall'],
+                "keyword_risk_score": preprocessing_stats['keyword_analysis']['keyword_score']
+            }
+        
         return result
     
     except Exception as e:

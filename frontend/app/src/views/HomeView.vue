@@ -173,26 +173,67 @@ export default {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .home {
+    padding: 1rem;
+  }
+
   .content-wrapper {
     margin-left: 0;
     max-width: 100%;
   }
   
+  .logo {
+    max-width: 100px;
+  }
+
   .main-title {
-    font-size: 3rem;
-    letter-spacing: 4px;
+    font-size: 2.5rem;
   }
   
   .subtitle {
     font-size: 1rem;
   }
+
+  .description {
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+
+  .search-section {
+    margin-top: 2rem;
+  }
+
+  .search-bar {
+    padding: 1rem 1.2rem;
+    font-size: 0.9rem;
+  }
   
   .check-button {
     width: 100%;
+    padding: 1rem 2rem;
   }
 
   .footer {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .home {
+    padding: 0.75rem;
+  }
+
+  .main-title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .description {
+    font-size: 0.85rem;
   }
 }
 
