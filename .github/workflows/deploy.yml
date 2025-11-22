@@ -39,6 +39,7 @@ jobs:
           npm install
           npm run build
           sudo rm -rf /var/www/frontend/*
+          sudo mkdir /var/www/frontend
           sudo cp -r dist/* /var/www/frontend/
 
       # 5. Restartovanje nginx servisa na VM-u putem SSH
