@@ -39,11 +39,6 @@ jobs:
           npm install
           npm run build
           sudo rm -rf /var/www/frontend/*
-       
-      # 5. Kreiranje direktorijuma ako ne postoji i kopiranje dist fajlova
-      - name: Copy dist files to frontend directory
-        run: |
-          sudo mkdir -p /var/www/frontend
           sudo cp -r dist/* /var/www/frontend/
 
       # 5. Restartovanje nginx servisa na VM-u putem SSH
