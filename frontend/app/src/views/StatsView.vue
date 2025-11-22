@@ -312,7 +312,7 @@
     </div>
 
     <footer class="footer">
-      <p>&copy; 2025 The Sthrokaders | AI NATION Hackathon by Yandex & Repute</p>
+      <p>&copy; 2025 The Sthrokaders | AI NATION Hackathon by Yandex & Reputeo</p>
     </footer>
   </div>
 </template>
