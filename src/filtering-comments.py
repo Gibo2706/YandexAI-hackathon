@@ -106,9 +106,8 @@ def stream_and_filter(input_file, output_base_name, item_type="submission"):
                     if not is_valid_length_content(full_text):
                         continue
                         
-                    if item_type == "submission":
-                        if not contains_keywords(full_text):
-                            continue
+                    if not contains_keywords(full_text):
+                        continue
                     
                     # --- PRIPREMA PODATAKA ---
                     minified_data = {
@@ -162,19 +161,19 @@ if __name__ == "__main__":
     base_path = "./dataset" 
     
     # 1. Filtriranje SUBMISSIONS
-    submit_input = os.path.join(base_path, "RS_2022-09.zst") 
-    if os.path.exists(submit_input):
-        stream_and_filter(
-            submit_input, 
-            "filtered_submissions.jsonl",  # Skripta će dodati _part_001, _part_002...
-            item_type="submission"
-        )
+    # submit_input = os.path.join(base_path, "RS_2022-09.zst") 
+    # if os.path.exists(submit_input):
+    #     stream_and_filter(
+    #         submit_input, 
+    #         "filtered_submissions.jsonl",  # Skripta će dodati _part_001, _part_002...
+    #         item_type="submission"
+    #     )
     
     # 2. Filtriranje COMMENTS
-    # comment_input = os.path.join(base_path, "RC_2023-01.zst")
-    # if os.path.exists(comment_input):
-    #     stream_and_filter(
-    #         comment_input, 
-    #         "filtered_comments.jsonl",     # Skripta će dodati _part_001, _part_002...
-    #         item_type="comment"
-    #     )
+    comment_input = os.path.join(base_path, "RC_2022-09.zst")
+    if os.path.exists(comment_input):
+        stream_and_filter(
+            comment_input, 
+            "filtered_comments.jsonl",     # Skripta će dodati _part_001, _part_002...
+            item_type="comment"
+        )
