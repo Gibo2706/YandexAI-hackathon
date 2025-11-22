@@ -88,7 +88,12 @@ def prepare_analysis_context(query: str, search_results: List[Dict[str, Any]]) -
     return context
 
 
-def analyze_with_grok(query: str, search_results: List[Dict[str, Any]], use_preprocessing: bool = True) -> Dict[str, Any]:
+def analyze_with_grok(
+    query: str, 
+    search_results: List[Dict[str, Any]], 
+    use_preprocessing: bool = True,
+    additional_context: str = None
+) -> Dict[str, Any]:
     """
     Analizira Reddit diskusije sa Grok LLM-om.
     
@@ -96,6 +101,7 @@ def analyze_with_grok(query: str, search_results: List[Dict[str, Any]], use_prep
         query: User query
         search_results: Lista Reddit diskusija
         use_preprocessing: Ako True, koristi advanced preprocessing (default: True)
+        additional_context: Extra kontekst (npr. HTML analysis) koji se dodaje uz Reddit
     """
     
     # PREPROCESSING: Obogati podatke pre slanja LLM-u
@@ -107,6 +113,10 @@ def analyze_with_grok(query: str, search_results: List[Dict[str, Any]], use_prep
         # Legacy mode (bez preprocessinga)
         context = prepare_analysis_context(query, search_results)
         preprocessing_stats = None
+    
+    # Dodaj additional_context ako postoji (npr. HTML keyword findings)
+    if additional_context:
+        context = additional_context + context
     
     system_prompt = """You are an expert fraud detection analyst analyzing Reddit discussions with PREPROCESSED data.
 
@@ -121,6 +131,7 @@ Your task:
    - Direct scam mention counts
    - Keyword analysis results
 5. Provide actionable risk assessment based on MULTIPLE data sources
+6. If WEBSITE HTML CONTEXT is provided at the top, consider it alongside Reddit data
 
 Return JSON with:
 {
@@ -130,7 +141,7 @@ Return JSON with:
   "red_flags": ["warning sign 1", "warning sign 2", ...],
   "green_flags": ["positive indicator 1", ...],
   "key_points": ["important finding 1", "important finding 2", ...],
-  "recommendation": "AVOID/CAUTION/INVESTIGATE/SAFE",
+  "recommendation": "AVOID/HIGH_CAUTION/INVESTIGATE/LOW_RISK/LIKELY_SAFE",
   "debate_summary": "summary of disagreements in threads",
   "reasoning": "detailed explanation using preprocessing stats, credibility scores, and keyword analysis"
 }
@@ -140,6 +151,7 @@ IMPORTANT:
 - Trust high-credibility discussions more than low-credibility ones
 - Consider keyword risk scores in your assessment
 - Community consensus (strong_agreement vs controversial) is a KEY signal
+- If HTML context shows critical red flags, weight that heavily
 - Recent vs old discussions
 - Subreddit reputation (r/scams vs r/investing)
 """
@@ -148,8 +160,11 @@ IMPORTANT:
         # Proceni veličinu konteksta (približno 4 chars = 1 token)
         estimated_tokens = len(context) / 4
         
+        # LIMIT: Groq API ima ~8K token context window, ostavi marginu
+        MAX_TOKENS = 6000  # Safe limit sa marginom za response
+        
         # Ako je kontekst prevelik, podeli na 2 dela i analiziraj odvojeno
-        if estimated_tokens > 10000:  # Ostavi marginu
+        if estimated_tokens > MAX_TOKENS:
             mid_point = len(search_results) // 2
             
             # Analiza prvog dela

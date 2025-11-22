@@ -30,7 +30,6 @@ app.add_middleware(
 )
 
 
-# Validation Error Handler (za debug 422 errors)
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     print(f"❌ VALIDATION ERROR:")

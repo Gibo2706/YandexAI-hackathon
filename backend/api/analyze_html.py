@@ -5,60 +5,67 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from embedding.html_analyzer import analyze_html_page
+from embedding.html_analyzer import (
+    extract_text_from_html, 
+    detect_scam_patterns, 
+    extract_company_info,
+    build_search_query
+)
 from embedding.search_embeddings import search_similar_documents
-from embedding.llm_analysis import analyze_with_grok
 from embedding.preprocessing import preprocess_reddit_data
+from embedding.llm_analysis import analyze_with_grok
 
 
 def analyze_html_endpoint(html_content: str, k: int = 20) -> Dict[str, Any]:
+    """
+    Analizira HTML stranicu - IDENTIČAN output kao /analyze!
+    
+    Jedina razlika:
+    1. Generiše query iz HTML-a (umesto da ga user šalje)
+    2. Šalje HTML context Groku kao additional_context
+    """
     try:
-        # 1. HTML analiza
-        html_analysis = analyze_html_page(html_content)
-        search_query = html_analysis['search_query']
-
-        # 2. Reddit search
+        # 1. Parse HTML i generiši search query
+        extracted_data = extract_text_from_html(html_content)
+        html_keywords = detect_scam_patterns(extracted_data)
+        company_info = extract_company_info(extracted_data)
+        search_query = build_search_query(extracted_data, company_info, html_keywords)
+        
+        # 2. ISTI PIPELINE KAO /analyze
         search_results = search_similar_documents(
             query=search_query,
             index_dir="data/index",
             k=k
         )
-
-        # 3. Preprocess Reddit data (enrichment)
-        if search_results:
-            preprocessed = preprocess_reddit_data(search_results, search_query)
-            enriched_results = preprocessed['enriched_results']
-            aggregate_stats = preprocessed['aggregate_stats']
-            
-            # 4. Grok LLM analiza sa enrichment-om
-            reddit_analysis = analyze_with_grok(
-                search_query, 
-                search_results,
-                use_preprocessing=True
+        
+        if not search_results:
+            raise HTTPException(
+                status_code=404,
+                detail="No Reddit discussions found for this query"
             )
-        else:
-            enriched_results = []
-            aggregate_stats = {}
-            reddit_analysis = {
-                "scam_score": -1,
-                "confidence": 0,
-                "summary": "No similar Reddit discussions found",
-                "red_flags": [],
-                "green_flags": [],
-                "key_points": [],
-                "recommendation": "INVESTIGATE",
-                "reasoning": "Insufficient Reddit data for comparison"
-            }
-
-        # 5. Combine analyses
-        combined_result = _combine_analyses(
-            html_analysis, 
-            reddit_analysis, 
-            enriched_results,
-            aggregate_stats
+        
+        # 3. Preprocess Reddit data (enrichment)
+        preprocessed = preprocess_reddit_data(search_results, search_query)
+        
+        # 4. Build HTML context za Grok (additional info)
+        html_context = _build_html_context(extracted_data, html_keywords)
+        
+        # 5. Grok analysis sa HTML kontekstom
+        analysis = analyze_with_grok(
+            search_query, 
+            search_results,
+            use_preprocessing=True,
+            additional_context=html_context  # Extra info iz HTML-a
         )
         
-        return combined_result
+        # 6. IDENTIČAN OUTPUT KAO /analyze
+        return {
+            "query": search_query,  # Generisan iz HTML-a
+            "num_discussions_analyzed": len(search_results),
+            "enriched_results": preprocessed['enriched_results'],
+            "aggregate_stats": preprocessed['aggregate_stats'],
+            "analysis": analysis  # Isti format kao /analyze
+        }
     
     except FileNotFoundError as e:
         raise HTTPException(
@@ -68,106 +75,60 @@ def analyze_html_endpoint(html_content: str, k: int = 20) -> Dict[str, Any]:
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Greška pri analizi HTML-a: {str(e)}"
+            detail=f"Greška: {str(e)}"
         )
 
 
-def _combine_analyses(
-    html_analysis: Dict[str, Any], 
-    reddit_analysis: Dict[str, Any], 
-    enriched_results: list,
-    aggregate_stats: Dict[str, Any]
-) -> Dict[str, Any]:
-    """Kombinuje HTML i Reddit analizu sa enrichment podacima"""
+def _build_html_context(extracted_data: Dict[str, Any], html_keywords: Dict[str, Any]) -> str:
+    """
+    Kreira dodatni kontekst iz HTML-a za Grok LLM.
+    Ovo se dodaje uz Reddit diskusije.
     
-    html_score = html_analysis['llm_preliminary_analysis'].get('scam_score', 50)
-    reddit_score = reddit_analysis.get('scam_score', 50)
+    LIMITIRAN na ~500 tokena (~2000 chars) da ne preoptereti context.
+    """
+    context = "\n" + "="*80 + "\n"
+    context += "ADDITIONAL CONTEXT FROM WEBSITE HTML:\n"
+    context += "="*80 + "\n\n"
     
-    if reddit_score < 0:
-        combined_score = html_score
-        weight_info = "100% HTML analysis (no Reddit data)"
-    else:
-        combined_score = int(html_score * 0.6 + reddit_score * 0.4)
-        weight_info = f"60% HTML (score={html_score}) + 40% Reddit (score={reddit_score})"
+    # Page info (skraćeno)
+    title = extracted_data.get('title', 'N/A')
+    if len(title) > 100:
+        title = title[:100] + "..."
     
-    combined_red_flags = list(set(
-        html_analysis['algorithmic_analysis']['red_flags'] +
-        html_analysis['llm_preliminary_analysis'].get('red_flags', []) +
-        reddit_analysis.get('red_flags', [])
-    ))
+    description = extracted_data.get('description', 'N/A')
+    if len(description) > 150:
+        description = description[:150] + "..."
     
-    combined_green_flags = list(set(
-        html_analysis['algorithmic_analysis']['green_flags'] +
-        html_analysis['llm_preliminary_analysis'].get('green_flags', []) +
-        reddit_analysis.get('green_flags', [])
-    ))
+    context += f"Website Title: {title}\n"
+    context += f"Meta Description: {description}\n\n"
     
-    recommendation = _get_recommendation(combined_score)
+    # Main headings (TOP 5, skraćeno)
+    headings = extracted_data.get('headings', [])
+    if headings:
+        truncated_headings = [h[:50] for h in headings[:5]]  # Max 50 chars svaki
+        context += f"Main Headings: {', '.join(truncated_headings)}\n\n"
     
-    return {
-        "query": html_analysis['search_query'],
-        "num_discussions_analyzed": len(enriched_results),
-        
-        # HTML ANALYSIS
-        "html_analysis": {
-            "company_info": html_analysis['company_info'],
-            "extracted_data": html_analysis['extracted_data'],
-            "algorithmic_score": html_analysis['algorithmic_analysis']['algorithmic_score'],
-            "keyword_findings": {
-                "red_flags": html_analysis['algorithmic_analysis']['red_flags'][:10],
-                "green_flags": html_analysis['algorithmic_analysis']['green_flags'][:10]
-            }
-        },
-        
-        # REDDIT ANALYSIS (sa enrichment-om)
-        "reddit_analysis": {
-            "discussions_found": len(enriched_results) > 0,
-            "enriched_results": enriched_results,
-            "aggregate_stats": aggregate_stats,
-            "llm_summary": reddit_analysis.get('summary', '')
-        },
-        
-        # COMBINED VERDICT
-        "combined_verdict": {
-            "overall_scam_score": combined_score,
-            "verdict": recommendation,
-            "confidence": reddit_analysis.get('confidence', 70) / 100,
-            "reasoning": f"Combined analysis ({weight_info}). {reddit_analysis.get('reasoning', '')}",
-            "red_flags": combined_red_flags[:15],
-            "green_flags": combined_green_flags[:15],
-            "key_points": (
-                html_analysis['llm_preliminary_analysis'].get('key_points', []) +
-                reddit_analysis.get('key_points', [])
-            )[:15],
-            "breakdown": {
-                "html_score": html_score,
-                "reddit_score": reddit_score if reddit_score >= 0 else None,
-                "weight_strategy": weight_info
-            }
-        }
-    }
-
-
-def _get_recommendation(score: int) -> str:
-    """Određuje preporuku na osnovu scam score-a"""
-    if score >= 75:
-        return "AVOID"
-    elif score >= 55:
-        return "HIGH_CAUTION"
-    elif score >= 35:
-        return "INVESTIGATE"
-    elif score >= 20:
-        return "LOW_RISK"
-    else:
-        return "LIKELY_SAFE"
-
-
-def _build_summary(html_analysis: Dict[str, Any], reddit_analysis: Dict[str, Any]) -> str:
-    """Kreira sažetak koji kombinuje HTML i Reddit analizu"""
-    html_summary = html_analysis['llm_preliminary_analysis'].get('summary', 'N/A')
-    reddit_summary = reddit_analysis.get('summary', 'N/A')
+    # HTML keyword findings - TOP 8 red flags (ne 10)
+    red_flags = html_keywords.get('red_flags', [])
+    if red_flags:
+        context += f"WEBSITE RED FLAGS DETECTED ({len(red_flags)} total):\n"
+        for flag in red_flags[:8]:  # Top 8 (ne 10)
+            context += f"  • {flag}\n"
+        context += "\n"
     
-    if reddit_summary == "No similar Reddit discussions found":
-        return f"Website Analysis: {html_summary}"
-    else:
-        return f"Website: {html_summary} | Reddit Community: {reddit_summary}"
+    # Green flags - TOP 5 (ne 10)
+    green_flags = html_keywords.get('green_flags', [])
+    if green_flags:
+        context += f"WEBSITE TRUST SIGNALS ({len(green_flags)} total):\n"
+        for flag in green_flags[:5]:  # Top 5 (ne 10)
+            context += f"  • {flag}\n"
+        context += "\n"
+    
+    context += f"HTML Algorithmic Score: {html_keywords.get('algorithmic_score', 0)}/100\n"
+    context += "="*80 + "\n\n"
+    
+    # Safety check - max 2500 chars (~625 tokena)
+    if len(context) > 2500:
+        context = context[:2500] + "\n[Context truncated due to length]\n"
+    
+    return context
