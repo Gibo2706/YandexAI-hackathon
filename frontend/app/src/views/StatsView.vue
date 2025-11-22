@@ -1,8 +1,8 @@
 <template>
   <div class="stats">
     <div class="header-section">
-      <h1>Community Analysis Report</h1>
-      <p class="intro-text">Based on real Reddit discussions and user experiences from across multiple communities</p>
+      <h1>Analysis Report: <span class="search-query">{{ prompt }}</span></h1>
+      <p class="intro-text">Combining technical security checks with real human experiences from Reddit discussions.</p>
     </div>
     
     <!-- Key Metrics Cards -->
@@ -26,6 +26,114 @@
         <div class="metric-icon">⚠️</div>
         <div class="metric-value">{{ (sentimentData.scam * 100).toFixed(0) }}%</div>
         <div class="metric-label">Negative Sentiment</div>
+      </div>
+    </div>
+
+    <!-- External API Results Section -->
+    <div v-if="externalApi" class="external-api-section">
+      <h2>Technical & Security Analysis</h2>
+      <p class="section-description">Results from third-party security and validation APIs</p>
+      
+      <div class="api-results-grid">
+        <!-- Google Safe Browsing -->
+        <div class="api-card safe">
+          <div class="api-header">
+            <div class="api-icon">🛡️</div>
+            <div class="api-title">Google Safe Browsing</div>
+          </div>
+          <div class="api-status-badge safe">{{ externalApi.googleSafeBrowsing.status.toUpperCase() }}</div>
+          <p class="api-description">{{ externalApi.googleSafeBrowsing.description }}</p>
+          <div class="api-detail">Last checked: {{ externalApi.googleSafeBrowsing.lastChecked }}</div>
+        </div>
+
+        <!-- SSL Certificate -->
+        <div class="api-card" :class="externalApi.sslCertificate.valid ? 'safe' : 'warning'">
+          <div class="api-header">
+            <div class="api-icon">🔒</div>
+            <div class="api-title">SSL Certificate</div>
+          </div>
+          <div class="api-status-badge" :class="externalApi.sslCertificate.grade === 'A+' ? 'safe' : 'warning'">
+            Grade {{ externalApi.sslCertificate.grade }}
+          </div>
+          <p class="api-description">{{ externalApi.sslCertificate.encryption }} encryption</p>
+          <div class="api-detail">Issuer: {{ externalApi.sslCertificate.issuer }}</div>
+          <div class="api-detail">Expires: {{ externalApi.sslCertificate.expiryDate }} ({{ externalApi.sslCertificate.daysUntilExpiry }} days)</div>
+        </div>
+
+        <!-- VirusTotal -->
+        <div class="api-card" :class="externalApi.virusTotal.malicious === 0 ? 'safe' : 'danger'">
+          <div class="api-header">
+            <div class="api-icon">🔍</div>
+            <div class="api-title">VirusTotal Scan</div>
+          </div>
+          <div class="api-status-badge" :class="externalApi.virusTotal.malicious === 0 ? 'safe' : 'danger'">
+            {{ externalApi.virusTotal.clean }}/{{ externalApi.virusTotal.totalEngines }} Clean
+          </div>
+          <p class="api-description">Multi-engine malware scan results</p>
+          <div class="api-detail">Malicious: {{ externalApi.virusTotal.malicious }}</div>
+          <div class="api-detail">Suspicious: {{ externalApi.virusTotal.suspicious }}</div>
+          <div class="api-detail">Community Score: +{{ externalApi.virusTotal.communityScore }}</div>
+        </div>
+
+        <!-- WHOIS Data -->
+        <div class="api-card safe">
+          <div class="api-header">
+            <div class="api-icon">📋</div>
+            <div class="api-title">Domain Information</div>
+          </div>
+          <div class="api-status-badge safe">{{ externalApi.whoisData.domainAge }}</div>
+          <p class="api-description">Registered with {{ externalApi.whoisData.registrar }}</p>
+          <div class="api-detail">Registration: {{ externalApi.whoisData.registrationDate }}</div>
+          <div class="api-detail">Country: {{ externalApi.whoisData.registrantCountry }}</div>
+          <div class="api-detail">Expires: {{ externalApi.whoisData.expiryDate }}</div>
+        </div>
+
+        <!-- ScamAdvisor -->
+        <div class="api-card" :class="externalApi.scamAdvisor.trustScore > 70 ? 'safe' : 'warning'">
+          <div class="api-header">
+            <div class="api-icon">⭐</div>
+            <div class="api-title">ScamAdvisor</div>
+          </div>
+          <div class="api-status-badge" :class="externalApi.scamAdvisor.trustScore > 70 ? 'safe' : 'warning'">
+            {{ externalApi.scamAdvisor.trustScore }}/100
+          </div>
+          <p class="api-description">Trust score: {{ externalApi.scamAdvisor.risk }}</p>
+          <div class="api-highlights">
+            <div v-for="(highlight, idx) in externalApi.scamAdvisor.highlights" :key="idx" class="highlight-item">
+              • {{ highlight }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Website Analytics -->
+        <div class="api-card safe">
+          <div class="api-header">
+            <div class="api-icon">📊</div>
+            <div class="api-title">Traffic Analytics</div>
+          </div>
+          <div class="api-status-badge safe">{{ externalApi.websiteAnalytics.monthlyVisitors }} visits/mo</div>
+          <p class="api-description">Global ranking and traffic data</p>
+          <div class="api-detail">Alexa Rank: #{{ externalApi.websiteAnalytics.alexaRank.toLocaleString() }}</div>
+          <div class="api-detail">Avg. Session: {{ externalApi.websiteAnalytics.avgSessionDuration }}</div>
+          <div class="api-detail">Bounce Rate: {{ externalApi.websiteAnalytics.bounceRate }}</div>
+        </div>
+      </div>
+
+      <!-- Technical Checks Summary -->
+      <div v-if="technicalChecks && technicalChecks.length" class="technical-checks-section">
+        <h3>Security Checklist</h3>
+        <div class="checks-grid">
+          <div v-for="(check, idx) in technicalChecks" :key="idx" class="check-item" :class="check.status">
+            <div class="check-header">
+              <span class="check-icon" :class="check.status">
+                {{ check.status === 'pass' ? '✓' : '⚠' }}
+              </span>
+              <span class="check-name">{{ check.name }}</span>
+              <span class="check-score">{{ check.score }}%</span>
+            </div>
+            <p class="check-details">{{ check.details }}</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -217,13 +325,16 @@ import redditData, {
   getRiskFactors,
   getDecisionFactors,
   getWordAnalysis,
-  getRecommendations
+  getRecommendations,
+  getExternalApiResults,
+  getTechnicalChecks
 } from '@/data/data.js'
 
 export default {
   name: 'StatsView',
   data() {
     return {
+      prompt: this.$route.query.prompt || 'Kiwi.com',
       redditData: redditData,
       sentimentData: getSentimentPercentages(),
       metrics: getAnalysisMetrics(),
@@ -231,7 +342,9 @@ export default {
       riskFactors: getRiskFactors(),
       decisionFactors: getDecisionFactors(),
       wordAnalysis: getWordAnalysis(),
-      recommendations: getRecommendations()
+      recommendations: getRecommendations(),
+      externalApi: getExternalApiResults(),
+      technicalChecks: getTechnicalChecks()
     }
   },
   computed: {
@@ -311,6 +424,15 @@ export default {
   letter-spacing: -1px;
 }
 
+.search-query {
+  color: #FF4500;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: #FF4500;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+}
+
 .intro-text {
   color: #808080;
   font-size: 1rem;
@@ -388,6 +510,234 @@ export default {
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+/* Layout Container */
+.layout-container {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* External API Section */
+.external-api-section {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: #0a0a0a;
+  border: 2px solid #2a2a2a;
+}
+
+.external-api-section h2 {
+  color: #FFFFFF;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.api-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.api-card {
+  background: #1a1a1a;
+  border: 2px solid #2a2a2a;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.api-card.safe {
+  border-top: 3px solid #606060;
+}
+
+.api-card.warning {
+  border-top: 3px solid #ff8844;
+}
+
+.api-card.danger {
+  border-top: 3px solid #FF4500;
+}
+
+.api-card:hover {
+  border-color: #FF4500;
+  transform: translateY(-3px);
+}
+
+.api-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.api-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  border: 2px solid #2a2a2a;
+}
+
+.api-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.api-status-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.api-status-badge.safe {
+  background: #606060;
+}
+
+.api-status-badge.warning {
+  background: #ff8844;
+  color: #0a0a0a;
+}
+
+.api-status-badge.danger {
+  background: #FF4500;
+}
+
+.api-description {
+  color: #b0b0b0;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.api-detail {
+  color: #808080;
+  font-size: 0.85rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.api-detail:last-child {
+  border-bottom: none;
+}
+
+.api-highlights {
+  margin-top: 1rem;
+}
+
+.highlight-item {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  padding: 0.3rem 0;
+  line-height: 1.5;
+}
+
+/* Technical Checks Section */
+.technical-checks-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #2a2a2a;
+}
+
+.technical-checks-section h3 {
+  color: #e0e0e0;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.checks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.check-item {
+  background: #1a1a1a;
+  border: 2px solid #2a2a2a;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.check-item:hover {
+  border-color: #3a3a3a;
+  background: #252525;
+}
+
+.check-item.pass {
+  border-left: 3px solid #606060;
+}
+
+.check-item.warning {
+  border-left: 3px solid #ff8844;
+}
+
+.check-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.check-icon {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  background: #0a0a0a;
+  border: 2px solid #2a2a2a;
+}
+
+.check-icon.pass {
+  color: #606060;
+  border-color: #606060;
+}
+
+.check-icon.warning {
+  color: #ff8844;
+  border-color: #ff8844;
+}
+
+.check-name {
+  flex: 1;
+  color: #e0e0e0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.check-score {
+  color: #FF4500;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.check-details {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.5;
 }
 
 /* Layout Container */
