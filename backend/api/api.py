@@ -1,5 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional, Dict, Any, List
 import uvicorn
@@ -28,11 +30,31 @@ app.add_middleware(
 )
 
 
+# Validation Error Handler (za debug 422 errors)
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    print(f"❌ VALIDATION ERROR:")
+    print(f"   URL: {request.url}")
+    print(f"   Method: {request.method}")
+    print(f"   Errors: {exc.errors()}")
+    print(f"   Body: {await request.body()}")
+    
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": exc.errors(),
+            "body_received": str(await request.body()),
+            "help": "Check if Content-Type is 'application/json' and body is valid JSON"
+        }
+    )
+
+
 class SearchRequest(BaseModel):
     query: str
     k: Optional[int] = 20 
     
     class Config:
+        extra = "ignore"  # Ignoriši extra fields
         json_schema_extra = {
             "example": {
                 "query": "is this crypto investment a scam?",
@@ -46,6 +68,7 @@ class AnalyzeRequest(BaseModel):
     k: Optional[int] = 20
     
     class Config:
+        extra = "ignore"  # Ignoriši extra fields iz frontend-a
         json_schema_extra = {
             "example": {
                 "query": "is this crypto investment a scam?",
@@ -59,6 +82,7 @@ class HtmlAnalyzeRequest(BaseModel):
     k: Optional[int] = 20
     
     class Config:
+        extra = "ignore"  # Ignoriši extra fields
         json_schema_extra = {
             "example": {
                 "html_content": "<html><body><h1>Amazing Investment Opportunity!</h1></body></html>",
