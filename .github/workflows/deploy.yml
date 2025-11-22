@@ -22,8 +22,8 @@ jobs:
           FRONTEND_CHANGED=false
           
           git fetch origin
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changes.txt
-          
+          git diff --name-only HEAD~1 HEAD > changes.txt  # Umesto korišćenja commit hash-a
+
           # Detekcija promena u backendu
           if grep -q "backend/" changes.txt; then
             BACKEND_CHANGED=true
@@ -36,7 +36,7 @@ jobs:
 
           echo "::set-output name=backend_changed::${BACKEND_CHANGED}"
           echo "::set-output name=frontend_changed::${FRONTEND_CHANGED}"
-
+          
       # 3. Ako se promenio backend, rebuilduj i deployuj FastAPI
       - name: Build and deploy Backend
         if: ${{ steps.changes.outputs.backend_changed == 'true' }}
