@@ -14,14 +14,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Instalacija zavisnosti i build
+      # 2. Instalacija zavisnosti i build Backenda
       - name: Install dependencies and build Backend
         run: |
           cd backend
           git pull origin develop
           sudo pip install --ignore-installed -r requirements.txt
-          sudo systemctl restart fastapi
+          
+      # 3. Restartovanje FastAPI servisa na VM-u putem SSH
+      - name: Restart FastAPI service on VM
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.YC_VM_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl restart fastapi.service
 
+      # 4. Instalacija zavisnosti i build Frontenda
       - name: Install dependencies and build Frontend
         run: |
           cd frontend/app
@@ -30,4 +40,13 @@ jobs:
           npm run build
           sudo rm -rf /var/www/frontend/*
           sudo cp -r dist/* /var/www/frontend/
-          sudo systemctl restart nginx
+
+      # 5. Restartovanje nginx servisa na VM-u putem SSH
+      - name: Restart nginx service on VM
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.YC_VM_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl restart nginx
