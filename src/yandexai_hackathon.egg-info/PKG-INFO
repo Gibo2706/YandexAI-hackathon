@@ -1,0 +1,23 @@
+Metadata-Version: 2.4
+Name: yandexai-hackathon
+Version: 0.1.0
+Summary: Reddit scam/trust detection – filtering + document building + embeddings pipeline
+Requires-Python: >=3.10
+Requires-Dist: pydantic<3.0,>=2.7
+Requires-Dist: pandas<3.0,>=2.1
+Requires-Dist: numpy<2.0,>=1.26
+Requires-Dist: tqdm<5.0,>=4.66
+Requires-Dist: orjson<4.0,>=3.10
+Requires-Dist: datasets<4.0,>=3.0
+Requires-Dist: faiss-cpu<2.0,>=1.8
+Requires-Dist: sentence-transformers<4.0,>=3.0
+Requires-Dist: pyyaml<7.0,>=6.0
+Requires-Dist: fastapi<1.0,>=0.95
+Requires-Dist: uvicorn[standard]<1.0,>=0.22
+Requires-Dist: openai>=1.0.0
+Requires-Dist: python-dotenv>=1.0
+Provides-Extra: dev
+Requires-Dist: ipykernel; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: pytest; extra == "dev"

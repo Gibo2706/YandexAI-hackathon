@@ -1,0 +1,212 @@
+<template>
+  <div class="home">
+    <div class="content-wrapper">
+      <div class="logo-container">
+        <img alt="Reddit logo" src="../assets/reddit.png" class="logo">
+      </div>
+      
+      <h1 class="main-title">Scam Checker</h1>
+      <p class="subtitle">Real people. Real experiences. Real protection.</p>
+      <p class="description">Check any website, seller, service, or product through authentic Reddit community discussions. Our AI analyzes thousands of real user experiences to help you make informed decisions.</p>
+      
+      <div class="search-section">
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="Enter website name, seller, service, or product" 
+            class="search-bar"
+          />
+        </div>
+        <button @click="goToStats" class="check-button">
+          <span>Analyze</span>
+        </button>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>&copy; 2025 The Sthrokaders | AI NATION Hackathon by Yandex & Reputeo</p>
+    </footer>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'HomeView',
+  data() {
+    return {
+      searchQuery: ''
+    }
+  },
+  methods: {
+    goToStats() {
+      this.$router.push('/stats')
+    }
+  }
+}
+</script>
+
+<style scoped>
+.home {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 2rem;
+  background-image: url('../assets/backgroundHQ.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.content-wrapper {
+  max-width: 800px;
+  margin-left: 8%;
+}
+
+.logo-container {
+  margin-bottom: 2rem;
+}
+
+.logo {
+  max-width: 150px;
+  height: auto;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}
+
+.main-title {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 1.3rem;
+  color: #FF4500;
+  margin: 0;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.description {
+  font-size: 1rem;
+  color: #b0b0b0;
+  margin: 0;
+  margin-bottom: 3rem;
+  font-weight: 400;
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 1.2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  font-size: 1rem;
+  color: #ffffff;
+  outline: none;
+  transition: all 0.3s ease;
+  font-weight: 400;
+}
+
+.search-bar::placeholder {
+  color: #707070;
+  font-weight: 300;
+}
+
+.search-bar:focus {
+  border-color: #FF4500;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.check-button {
+  padding: 1.2rem 3rem;
+  background: #FF4500;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+  align-self: flex-start;
+}
+
+.check-button:hover {
+  background: #ff6a33;
+  transform: translateY(-2px);
+}
+
+.check-button:active {
+  transform: translateY(0);
+}
+
+.check-button span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-wrapper {
+    margin-left: 0;
+    max-width: 100%;
+  }
+  
+  .main-title {
+    font-size: 3rem;
+    letter-spacing: 4px;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+  
+  .check-button {
+    width: 100%;
+  }
+
+  .footer {
+    font-size: 0.75rem;
+  }
+}
+
+.footer {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 2;
+}
+
+.footer p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  font-weight: 300;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+</style>

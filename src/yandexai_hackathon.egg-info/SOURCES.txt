@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/__init__.py
+src/config.py
+src/documents.py
+src/embeddings.py
+src/filtering.py
+src/pipeline_example.py
+src/yandexai_hackathon.egg-info/PKG-INFO
+src/yandexai_hackathon.egg-info/SOURCES.txt
+src/yandexai_hackathon.egg-info/dependency_links.txt
+src/yandexai_hackathon.egg-info/requires.txt
+src/yandexai_hackathon.egg-info/top_level.txt
+tests/test_processor.py
