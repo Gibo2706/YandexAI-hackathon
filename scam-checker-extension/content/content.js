@@ -38,7 +38,12 @@
   // Check if current site is e-commerce related
   function isEcommerceSite() {
     const domain = window.location.hostname.toLowerCase();
-    const ecommerceKeywords = ['shop', 'store', 'buy', 'cart', 'checkout', 'product', 'amazon', 'ebay', 'etsy', 'marketplace'];
+    const ecommerceKeywords = [
+      'shop', 'store', 'buy', 'cart', 'checkout', 'product',
+      'amazon', 'ebay', 'etsy', 'marketplace',
+      'kupujem', 'prodajem', 'kupujemprodajem', 'olx', 'njuskalo',
+      'polovni', 'oglasi', 'halo', 'limundo'
+    ];
 
     // Check domain
     if (ecommerceKeywords.some(keyword => domain.includes(keyword))) {
@@ -71,21 +76,114 @@
     isAnalyzing = true;
     floatingButton.classList.add('sc-analyzing');
 
-    // DIRECT MOCK DATA - bypass background script for now
-    setTimeout(() => {
-      console.log('[Scam Checker] Showing mock results directly...');
+    try {
+      // Get page content
+      const pageData = extractPageData();
+      console.log('[Scam Checker] Page data extracted:', pageData);
+
+      // Send to background script for API call
+      chrome.runtime.sendMessage({
+        action: 'analyzeUrl',
+        data: {
+          url: window.location.href,
+          domain: window.location.hostname,
+          content: pageData.content,
+          timestamp: new Date().toISOString()
+        }
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('[Scam Checker] Chrome runtime error:', chrome.runtime.lastError);
+          isAnalyzing = false;
+          floatingButton.classList.remove('sc-analyzing');
+          showErrorMessage('Extension error: ' + chrome.runtime.lastError.message);
+          return;
+        }
+
+        console.log('[Scam Checker] Response received:', response);
+        isAnalyzing = false;
+        floatingButton.classList.remove('sc-analyzing');
+
+        if (response && response.success) {
+          console.log('[Scam Checker] ✅ Showing results...');
+          showQuickResults(response.data);
+          try {
+            chrome.storage.local.set({ currentPageAnalysis: response.data });
+          } catch (e) {
+            console.log('[Scam Checker] Storage error:', e);
+          }
+        } else {
+          console.error('[Scam Checker] ❌ Analysis failed:', response.error);
+          showErrorMessage(response.error || 'Analysis failed');
+        }
+      });
+
+      // Timeout fallback
+      setTimeout(() => {
+        if (isAnalyzing) {
+          console.log('[Scam Checker] ⏱️ Timeout - request took too long');
+          isAnalyzing = false;
+          floatingButton.classList.remove('sc-analyzing');
+          showErrorMessage('Analysis timeout - backend may be processing large data');
+        }
+      }, 35000); // 35 second timeout for all 3 API calls
+
+    } catch (error) {
+      console.error('[Scam Checker] Analysis error:', error);
       isAnalyzing = false;
       floatingButton.classList.remove('sc-analyzing');
+      showErrorMessage('Error: ' + error.message);
+    }
+  }
 
-      const mockData = getMockAnalysis();
-      showQuickResults(mockData);
+  // Show error message overlay
+  function showErrorMessage(errorText) {
+    const errorOverlay = document.createElement('div');
+    errorOverlay.id = 'scam-checker-error';
+    errorOverlay.className = 'sc-overlay';
 
-      try {
-        chrome.storage.local.set({ currentPageAnalysis: mockData });
-      } catch (e) {
-        console.log('[Scam Checker] Storage error (non-critical):', e);
+    errorOverlay.innerHTML = `
+      <div class="sc-overlay-content" style="background: rgba(231, 76, 60, 0.95);">
+        <div class="sc-close-btn" id="sc-error-close">×</div>
+        
+        <div class="sc-result-header">
+          <div class="sc-logo">⚠️</div>
+          <h3>Analysis Failed</h3>
+        </div>
+
+        <div style="padding: 20px; text-align: center;">
+          <p style="color: white; font-size: 14px; line-height: 1.6;">
+            ${errorText}
+          </p>
+          <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 15px;">
+            Check the console (F12) for details
+          </p>
+        </div>
+
+        <button class="sc-view-full-btn" id="sc-error-retry" style="background: white; color: #e74c3c;">
+          Retry
+        </button>
+      </div>
+    `;
+
+    document.body.appendChild(errorOverlay);
+    setTimeout(() => errorOverlay.classList.add('sc-visible'), 10);
+
+    document.getElementById('sc-error-close').addEventListener('click', () => {
+      errorOverlay.classList.remove('sc-visible');
+      setTimeout(() => errorOverlay.remove(), 300);
+    });
+
+    document.getElementById('sc-error-retry').addEventListener('click', () => {
+      errorOverlay.remove();
+      handleCheckPage();
+    });
+
+    setTimeout(() => {
+      if (errorOverlay.parentNode) {
+        errorOverlay.classList.remove('sc-visible');
+        setTimeout(() => errorOverlay.remove(), 300);
       }
-    }, 500);
+    }, 10000);
   }
 
   // Extract relevant page data
@@ -219,65 +317,19 @@
     });
   }
 
-  // Mock analysis data
+  // Mock analysis data - COMMENTED OUT, NO LONGER USED
+  /*
   function getMockAnalysis() {
     const domain = window.location.hostname;
     return {
       analysisId: `mock-${Date.now()}`,
       url: window.location.href,
       domain: domain,
-      riskScore: Math.floor(Math.random() * 40) + 20, // 20-60 range
-      sentiment: { scam: 0.21, legit: 0.79 },
-      metrics: {
-        postsAnalyzed: Math.floor(Math.random() * 200) + 50,
-        commentsReviewed: Math.floor(Math.random() * 500) + 100,
-        positiveSentiment: 79,
-        negativeSentiment: 21
-      },
-      indicators: {
-        positive: [
-          'Active community discussions',
-          'Multiple verified user testimonials',
-          'Consistent positive feedback',
-          'Good customer service response'
-        ],
-        warning: [
-          'Some refund complaints reported',
-          'Mixed reviews on customer support',
-          'Payment processing delays mentioned',
-          'Limited company information'
-        ]
-      },
-      riskFactors: [
-        { severity: 'MEDIUM', percentage: 45, description: 'Occasional customer complaints' },
-        { severity: 'LOW', percentage: 25, description: 'Support response time concerns' },
-        { severity: 'LOW', percentage: 20, description: 'Pricing transparency issues' }
-      ],
-      recommendations: [
-        { type: 'do', text: 'Use credit card for payment protection' },
-        { type: 'do', text: 'Screenshot all transaction confirmations' },
-        { type: 'warning', text: 'Read terms and conditions carefully' },
-        { type: 'warning', text: 'Verify seller credentials before purchase' }
-      ],
-      redditPosts: [
-        {
-          id: '1',
-          title: `Has anyone used ${domain}? Experiences?`,
-          subreddit: 'AskReddit',
-          score: 145,
-          numComments: 32
-        },
-        {
-          id: '2',
-          title: `${domain} Review Thread`,
-          subreddit: 'Reviews',
-          score: 89,
-          numComments: 21
-        }
-      ],
-      timestamp: new Date().toISOString()
+      riskScore: Math.floor(Math.random() * 40) + 20,
+      // ... rest of mock data
     };
   }
+  */
 
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
