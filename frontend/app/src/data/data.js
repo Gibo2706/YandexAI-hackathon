@@ -185,4 +185,103 @@ export function getRecommendations() {
   ];
 }
 
+export function getExternalApiResults() {
+  return {
+    googleSafeBrowsing: {
+      status: 'safe',
+      threatTypes: [],
+      lastChecked: '2025-11-22',
+      description: 'No threats detected by Google Safe Browsing API'
+    },
+    sslCertificate: {
+      valid: true,
+      issuer: 'Let\'s Encrypt',
+      expiryDate: '2026-02-15',
+      daysUntilExpiry: 85,
+      encryption: 'TLS 1.3',
+      grade: 'A+'
+    },
+    virusTotal: {
+      malicious: 0,
+      suspicious: 1,
+      clean: 89,
+      totalEngines: 90,
+      lastAnalysis: '2025-11-20',
+      communityScore: 12
+    },
+    whoisData: {
+      registrar: 'GoDaddy',
+      registrationDate: '2012-08-15',
+      expiryDate: '2026-08-15',
+      domainAge: '13 years',
+      registrantCountry: 'CZ',
+      privacy: false
+    },
+    dnsRecords: {
+      hasValidMX: true,
+      hasSPF: true,
+      hasDMARC: true,
+      nameservers: ['ns1.kiwi.com', 'ns2.kiwi.com'],
+      status: 'configured'
+    },
+    scamAdvisor: {
+      trustScore: 74,
+      risk: 'medium-low',
+      highlights: [
+        'Website has been active for over 10 years',
+        'Valid SSL certificate',
+        'Some negative reviews found online'
+      ]
+    },
+    websiteAnalytics: {
+      alexaRank: 8542,
+      monthlyVisitors: '12.5M',
+      pageViews: '45M',
+      avgSessionDuration: '4:32',
+      bounceRate: '42%'
+    }
+  };
+}
+
+export function getTechnicalChecks() {
+  return [
+    {
+      name: 'SSL Certificate',
+      status: 'pass',
+      score: 100,
+      details: 'Valid TLS 1.3 encryption, expires in 85 days'
+    },
+    {
+      name: 'Google Safe Browsing',
+      status: 'pass',
+      score: 100,
+      details: 'No threats or malicious content detected'
+    },
+    {
+      name: 'VirusTotal Scan',
+      status: 'warning',
+      score: 98,
+      details: '1/90 engines flagged as suspicious'
+    },
+    {
+      name: 'Domain Age',
+      status: 'pass',
+      score: 95,
+      details: 'Registered for 13 years (since 2012)'
+    },
+    {
+      name: 'Privacy Policy',
+      status: 'pass',
+      score: 85,
+      details: 'GDPR compliant, clear privacy policy present'
+    },
+    {
+      name: 'Contact Information',
+      status: 'pass',
+      score: 90,
+      details: 'Multiple contact methods available'
+    }
+  ];
+}
+
 export default redditData;

@@ -2,18 +2,18 @@
   <div class="home">
     <div class="content-wrapper">
       <div class="logo-container">
-        <img alt="Reddit logo" src="../assets/reddit.png" class="logo">
+        <img alt="Reddit logo" src="../assets/logoP.png" class="logo">
       </div>
       
-      <h1 class="main-title">Scam Checker</h1>
-      <p class="subtitle">Real people. Real experiences. Real protection.</p>
-      <p class="description">Check any website, seller, service, or product through authentic Reddit community discussions. Our AI analyzes thousands of real user experiences to help you make informed decisions.</p>
+      <h1 class="main-title">CheckMate</h1>
+      <p class="subtitle">CheckMate to Scammers. Real Reviews. Real Protection.</p>
+      <p class="description">Check any website name, seller, service, or product through authentic Reddit discussions, along with technical and content checks. Our AI analyzes thousands of real human experiences to guide your decisions.</p>
       
       <div class="search-section">
         <div class="input-wrapper">
           <input 
             type="text" 
-            v-model="searchQuery" 
+            v-model="prompt" 
             placeholder="Enter website name, seller, service, or product" 
             class="search-bar"
           />
@@ -35,12 +35,15 @@ export default {
   name: 'HomeView',
   data() {
     return {
-      searchQuery: ''
+      prompt: ''
     }
   },
   methods: {
     goToStats() {
-      this.$router.push('/stats')
+      this.$router.push({
+        name: 'stats',
+        query: { prompt: this.prompt || 'Kiwi.com' }
+      })
     }
   }
 }
@@ -65,7 +68,7 @@ export default {
 }
 
 .logo-container {
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .logo {
