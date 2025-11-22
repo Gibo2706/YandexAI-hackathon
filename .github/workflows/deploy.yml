@@ -10,53 +10,58 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repozitorijuma
+      # 1. Checkout
       - name: Checkout repository
-        uses: actions/checkout@v2
-
-      # 2. Detekcija promena u backendu i frontend-u
+        uses: actions/checkout@v3
+        
+      # 2. Detekcija promena (Mnogo pouzdanije od git diff skripte)
       - name: Detect changes
+        uses: dorny/paths-filter@v2
         id: changes
-        run: |
-          BACKEND_CHANGED=false
-          FRONTEND_CHANGED=false
-          
-          git fetch origin
-          git diff --name-only HEAD~1 HEAD > changes.txt  # Umesto korišćenja commit hash-a
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
 
-          # Detekcija promena u backendu
-          if grep -q "backend/" changes.txt; then
-            BACKEND_CHANGED=true
-          fi
-
-          # Detekcija promena u frontend-u
-          if grep -q "frontend/" changes.txt; then
-            FRONTEND_CHANGED=true
-          fi
-
-          echo "::set-output name=backend_changed::${BACKEND_CHANGED}"
-          echo "::set-output name=frontend_changed::${FRONTEND_CHANGED}"
-          
-      # 3. Ako se promenio backend, rebuilduj i deployuj FastAPI
-      - name: Build and deploy Backend
-        if: ${{ steps.changes.outputs.backend_changed == 'true' }}
-        run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.YC_VM_IP }} << 'EOF'
+      # 3. Deploy Backenda (Pokreće se samo ako ima promena u backend folderu)
+      - name: Deploy Backend
+        if: steps.changes.outputs.backend == 'true'
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.YC_VM_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
             cd /path/to/backend
+            # Resetujemo lokalne izmene ako ih ima, da git pull ne pukne
+            git reset --hard
             git pull origin develop
+            
+            # Aktiviraj venv ako ga koristiš (preporuka)
+            # source venv/bin/activate 
+            
             pip install -r requirements.txt
             sudo systemctl restart fastapi-service
-          EOF
 
-      # 4. Ako se promenio frontend, rebuilduj i deployuj Vue
-      - name: Build and deploy Frontend
-        if: ${{ steps.changes.outputs.frontend_changed == 'true' }}
-        run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.YC_VM_IP }} << 'EOF'
+      # 4. Deploy Frontenda (Pokreće se samo ako ima promena u frontend folderu)
+      - name: Deploy Frontend
+        if: steps.changes.outputs.frontend == 'true'
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.YC_VM_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
             cd /path/to/frontend
+            git reset --hard
             git pull origin develop
+            
             npm install
             npm run build
-            sudo cp -r dist/* /var/www/frontend
+            
+            # Često je sigurnije prvo obrisati stari dist pa kopirati novi
+            sudo rm -rf /var/www/frontend/*
+            sudo cp -r dist/* /var/www/frontend/
             sudo systemctl restart nginx
-          EOF
