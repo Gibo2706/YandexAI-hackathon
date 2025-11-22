@@ -3,65 +3,31 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - develop
+      - develop  # Bilo koji push na develop grani pokreće pipeline
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout
+      # 1. Checkout repozitorijuma
       - name: Checkout repository
         uses: actions/checkout@v3
-        
-      # 2. Detekcija promena (Mnogo pouzdanije od git diff skripte)
-      - name: Detect changes
-        uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            backend:
-              - 'backend/**'
-            frontend:
-              - 'frontend/**'
 
-      # 3. Deploy Backenda (Pokreće se samo ako ima promena u backend folderu)
-      - name: Deploy Backend
-        if: steps.changes.outputs.backend == 'true'
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.YC_VM_IP }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /path/to/backend
-            # Resetujemo lokalne izmene ako ih ima, da git pull ne pukne
-            git reset --hard
-            git pull origin develop
-            
-            # Aktiviraj venv ako ga koristiš (preporuka)
-            # source venv/bin/activate 
-            
-            pip install -r requirements.txt
-            sudo systemctl restart fastapi
+      # 2. Instalacija zavisnosti i build
+      - name: Install dependencies and build Backend
+        run: |
+          cd backend
+          git pull origin develop
+          pip install -r requirements.txt
+          sudo systemctl restart fastapi
 
-      # 4. Deploy Frontenda (Pokreće se samo ako ima promena u frontend folderu)
-      - name: Deploy Frontend
-        if: steps.changes.outputs.frontend == 'true'
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.YC_VM_IP }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /path/to/frontend/app
-            git reset --hard
-            git pull origin develop
-            
-            npm install
-            npm run build
-            
-            # Često je sigurnije prvo obrisati stari dist pa kopirati novi
-            sudo rm -rf /var/www/frontend/*
-            sudo cp -r dist/* /var/www/frontend/
-            sudo systemctl restart nginx
+      - name: Install dependencies and build Frontend
+        run: |
+          cd frontend/app
+          git pull origin develop
+          npm install
+          npm run build
+          sudo rm -rf /var/www/frontend/*
+          sudo cp -r dist/* /var/www/frontend/
+          sudo systemctl restart nginx
