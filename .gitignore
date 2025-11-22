@@ -10,8 +10,7 @@
 **/.env
 
 # Data files (keep only index folder)
-backend/data/*.jsonl
-backend/data/*.json
+backend/data/*
 
 # Python
 __pycache__/
