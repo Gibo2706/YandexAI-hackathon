@@ -1,0 +1,62 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repozitorijuma
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # 2. Detekcija promena u backendu i frontend-u
+      - name: Detect changes
+        id: changes
+        run: |
+          BACKEND_CHANGED=false
+          FRONTEND_CHANGED=false
+          
+          git fetch origin
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changes.txt
+          
+          # Detekcija promena u backendu
+          if grep -q "backend/" changes.txt; then
+            BACKEND_CHANGED=true
+          fi
+
+          # Detekcija promena u frontend-u
+          if grep -q "frontend/" changes.txt; then
+            FRONTEND_CHANGED=true
+          fi
+
+          echo "::set-output name=backend_changed::${BACKEND_CHANGED}"
+          echo "::set-output name=frontend_changed::${FRONTEND_CHANGED}"
+
+      # 3. Ako se promenio backend, rebuilduj i deployuj FastAPI
+      - name: Build and deploy Backend
+        if: ${{ steps.changes.outputs.backend_changed == 'true' }}
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.YC_VM_IP }} << 'EOF'
+            cd /path/to/backend
+            git pull origin develop
+            pip install -r requirements.txt
+            sudo systemctl restart fastapi-service
+          EOF
+
+      # 4. Ako se promenio frontend, rebuilduj i deployuj Vue
+      - name: Build and deploy Frontend
+        if: ${{ steps.changes.outputs.frontend_changed == 'true' }}
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ubuntu@${{ secrets.YC_VM_IP }} << 'EOF'
+            cd /path/to/frontend
+            git pull origin develop
+            npm install
+            npm run build
+            sudo cp -r dist/* /var/www/frontend
+            sudo systemctl restart nginx
+          EOF
