@@ -43,7 +43,7 @@ jobs:
             # source venv/bin/activate 
             
             pip install -r requirements.txt
-            sudo systemctl restart fastapi-service
+            sudo systemctl restart fastapi
 
       # 4. Deploy Frontenda (Pokreće se samo ako ima promena u frontend folderu)
       - name: Deploy Frontend
@@ -54,7 +54,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /path/to/frontend
+            cd /path/to/frontend/app
             git reset --hard
             git pull origin develop
             
