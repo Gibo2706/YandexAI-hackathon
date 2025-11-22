@@ -157,7 +157,7 @@ IMPORTANT:
             response1 = grok_client.chat.completions.create(
                 model=GROK_MODEL,
                 messages=[
-                    {"role": "system", "content": system_prompt + "\n\nNote: This is PART 1 of 2. Analyze these discussions."},
+                    {"role": "system", "content": system_prompt + "\n\nNote: This is PART 1 of 2. Analyze these discussions and provide preliminary findings."},
                     {"role": "user", "content": context_part1}
                 ],
                 temperature=0.3,
@@ -165,32 +165,38 @@ IMPORTANT:
             )
             result1 = json.loads(response1.choices[0].message.content)
             
-            # Analiza drugog dela
+            # Analiza drugog dela SA KONTEKSTOM iz Part 1
+            part1_summary = f"""
+PREVIOUS ANALYSIS (PART 1 - first {mid_point} discussions):
+- Scam Score: {result1.get('scam_score', 0)}/100
+- Confidence: {result1.get('confidence', 0)}/100
+- Key Red Flags: {', '.join(result1.get('red_flags', [])[:5])}
+- Key Green Flags: {', '.join(result1.get('green_flags', [])[:5])}
+- Preliminary Verdict: {result1.get('recommendation', 'INVESTIGATE')}
+- Summary: {result1.get('summary', '')}
+
+Now analyze PART 2 and provide a FINAL assessment considering both parts:
+"""
+            
             context_part2 = prepare_analysis_context(query, search_results[mid_point:])
             response2 = grok_client.chat.completions.create(
                 model=GROK_MODEL,
                 messages=[
-                    {"role": "system", "content": system_prompt + "\n\nNote: This is PART 2 of 2. Analyze these discussions."},
-                    {"role": "user", "content": context_part2}
+                    {"role": "system", "content": system_prompt + "\n\nNote: This is PART 2 of 2. You have context from Part 1. Provide FINAL analysis combining both parts."},
+                    {"role": "user", "content": part1_summary + "\n" + context_part2}
                 ],
                 temperature=0.3,
                 response_format={"type": "json_object"} 
             )
             result2 = json.loads(response2.choices[0].message.content)
             
-            # Kombinuj rezultate
-            combined_result = {
-                "scam_score": int((result1.get("scam_score", 0) + result2.get("scam_score", 0)) / 2),
-                "confidence": int((result1.get("confidence", 0) + result2.get("confidence", 0)) / 2),
-                "summary": f"{result1.get('summary', '')} {result2.get('summary', '')}",
-                "red_flags": list(set(result1.get("red_flags", []) + result2.get("red_flags", []))),
-                "green_flags": list(set(result1.get("green_flags", []) + result2.get("green_flags", []))),
-                "key_points": result1.get("key_points", []) + result2.get("key_points", []),
-                "recommendation": result1.get("recommendation", "INVESTIGATE"),
-                "debate_summary": f"Part 1: {result1.get('debate_summary', '')} | Part 2: {result2.get('debate_summary', '')}",
-                "reasoning": f"[PART 1] {result1.get('reasoning', '')} [PART 2] {result2.get('reasoning', '')}"
-            }
-            return combined_result
+            # Vrati result2 kao finalni (jer on već kombinuje obe analize)
+            # Ali dodaj metadata da se zna da je bilo split
+            result2['was_split_analysis'] = True
+            result2['part1_score'] = result1.get('scam_score', 0)
+            result2['part2_score'] = result2.get('scam_score', 0)
+            
+            return result2
         
         # Ako je kontekst OK veličine, uradi normalnu analizu
         response = grok_client.chat.completions.create(
