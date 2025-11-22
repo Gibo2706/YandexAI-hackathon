@@ -44,7 +44,7 @@ jobs:
       - name: Copy dist files to frontend directory
         run: |
           sudo mkdir -p /var/www/frontend
-          sudo -u ubuntu cp -r dist/* /var/www/frontend/
+          sudo cp -r dist/* /var/www/frontend/
 
       # 5. Restartovanje nginx servisa na VM-u putem SSH
       - name: Restart nginx service on VM
