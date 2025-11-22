@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scam Checker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <div class="loader" v-if="loading">
+      <div class="spinner"></div>
+      <p>Analyzing page...</p>
+    </div>
+
+    <!-- Quick Search View -->
+    <div v-else-if="!currentAnalysis" class="search-view">
+      <div class="header">
+        <img src="../assets/reddit-logo.svg" alt="Reddit" class="logo" onerror="this.style.display='none'">
+        <h1>Scam Checker</h1>
+        <p class="tagline">Reddit-powered trust analysis</p>
+      </div>
+
+      <div class="search-section">
+        <input
+          type="text"
+          v-model="searchQuery"
+          @keyup.enter="analyzeManual"
+          placeholder="Enter website, seller, or product"
+          class="search-input"
+        >
+        <button @click="analyzeManual" class="btn-analyze">Analyze</button>
+      </div>
+
+      <button @click="analyzeCurrentPage" class="btn-current-page">
+        <span class="icon">🔍</span>
+        Check Current Page
+      </button>
+
+      <div v-if="history.length > 0" class="history-section">
+        <h3>Recent Searches</h3>
+        <div class="history-list">
+          <div
+            v-for="item in history"
+            :key="item.id"
+            @click="loadAnalysis(item)"
+            class="history-item"
+          >
+            <div class="history-info">
+              <span class="history-domain">{{ item.domain }}</span>
+              <span class="history-time">{{ formatTime(item.timestamp) }}</span>
+            </div>
+            <div class="history-score" :class="getScoreClass(item.riskScore)">
+              {{ item.riskScore }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Analysis View -->
+    <div v-else class="analysis-view">
+      <button @click="backToSearch" class="btn-back">← Back</button>
+
+      <div class="analysis-header">
+        <h2>{{ currentAnalysis.domain }}</h2>
+        <div class="risk-badge" :class="getScoreClass(currentAnalysis.riskScore)">
+          Risk Score: {{ currentAnalysis.riskScore }}/100
+        </div>
+      </div>
+
+      <!-- Metrics Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon">📊</div>
+          <div class="metric-value">{{ currentAnalysis.metrics.postsAnalyzed }}</div>
+          <div class="metric-label">Posts</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">💬</div>
+          <div class="metric-value">{{ currentAnalysis.metrics.commentsReviewed }}</div>
+          <div class="metric-label">Comments</div>
+        </div>
+      </div>
+
+      <!-- Sentiment Bars -->
+      <div class="sentiment-section">
+        <h3>Sentiment Analysis</h3>
+        <div class="sentiment-bar-wrapper">
+          <div class="sentiment-bar-item">
+            <span class="sentiment-label">Positive</span>
+            <div class="sentiment-bar">
+              <div class="sentiment-fill positive" :style="{ width: (currentAnalysis.sentiment.legit * 100) + '%' }"></div>
+            </div>
+            <span class="sentiment-value">{{ (currentAnalysis.sentiment.legit * 100).toFixed(0) }}%</span>
+          </div>
+          <div class="sentiment-bar-item">
+            <span class="sentiment-label">Negative</span>
+            <div class="sentiment-bar">
+              <div class="sentiment-fill negative" :style="{ width: (currentAnalysis.sentiment.scam * 100) + '%' }"></div>
+            </div>
+            <span class="sentiment-value">{{ (currentAnalysis.sentiment.scam * 100).toFixed(0) }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Indicators -->
+      <div class="indicators-section">
+        <div class="indicator-group positive-group">
+          <h4>✓ Positive Signals</h4>
+          <ul>
+            <li v-for="item in currentAnalysis.indicators.positive" :key="item">{{ item }}</li>
+          </ul>
+        </div>
+        <div class="indicator-group warning-group">
+          <h4>⚠ Warning Signals</h4>
+          <ul>
+            <li v-for="item in currentAnalysis.indicators.warning" :key="item">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Risk Factors -->
+      <div class="risk-factors-section">
+        <h3>Risk Factors</h3>
+        <div v-for="risk in currentAnalysis.riskFactors" :key="risk.description" class="risk-item">
+          <div class="risk-header">
+            <span class="risk-severity" :class="risk.severity.toLowerCase()">{{ risk.severity }}</span>
+            <span class="risk-text">{{ risk.description }}</span>
+          </div>
+          <div class="risk-bar">
+            <div class="risk-fill" :style="{ width: risk.percentage + '%' }"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="recommendations-section">
+        <h3>Recommendations</h3>
+        <div v-for="rec in currentAnalysis.recommendations" :key="rec.text" class="recommendation" :class="rec.type">
+          <span class="rec-icon">{{ rec.type === 'warning' ? '⚠️' : '✓' }}</span>
+          <span class="rec-text">{{ rec.text }}</span>
+        </div>
+      </div>
+
+      <!-- Reddit Posts Preview -->
+      <div v-if="currentAnalysis.redditPosts && currentAnalysis.redditPosts.length > 0" class="reddit-preview">
+        <h3>Top Reddit Discussions ({{ currentAnalysis.redditPosts.length }})</h3>
+        <div v-for="post in currentAnalysis.redditPosts.slice(0, 3)" :key="post.id" class="reddit-post">
+          <div class="post-header">
+            <span class="subreddit">r/{{ post.subreddit }}</span>
+            <span class="post-score">▲ {{ post.score }}</span>
+          </div>
+          <p class="post-title">{{ post.title }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
+
