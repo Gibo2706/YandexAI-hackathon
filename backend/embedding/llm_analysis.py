@@ -146,6 +146,19 @@ Return JSON with:
   "reasoning": "detailed explanation PRIORITIZING Reddit community sentiment over HTML technicalities"
 }
 
+CONFIDENCE CALCULATION (IMPORTANT):
+- 85-100: Strong consensus (20+ discussions, clear pattern, high credibility)
+  Example: 15+ scam mentions, <3 positive vouches, avg credibility >60
+  Example: 0-2 scam mentions, 10+ positive vouches, avg credibility >70
+- 70-84: Good evidence (15-20 discussions, consistent feedback)
+  Example: 10+ scam mentions, scam-to-positive ratio >3.0
+  Example: <5 scam mentions, positive experiences dominant
+- 55-69: Moderate evidence (10-15 discussions, some consistency)
+  Example: Mixed opinions but pattern emerging
+- 40-54: Limited evidence (5-10 discussions, unclear pattern)
+  Example: Equal scam/positive mentions, low sample size
+- Below 40: Insufficient data (<5 discussions, contradictory signals)
+
 CRITICAL WEIGHTING:
 - Reddit community feedback = 70% weight
 - HTML technical findings = 30% weight
@@ -154,11 +167,9 @@ CRITICAL WEIGHTING:
 - Focus on actual user experiences: withdrawal issues, fraud reports, positive reviews
 - Missing legal pages ≠ scam (many legitimate small businesses lack these)
 - Trust high-credibility discussions more than low-credibility ones
-- Consider keyword risk scores in your assessment
 - Community consensus (strong_agreement vs controversial) is a KEY signal
-- If HTML context shows critical red flags, weight that heavily
-- Recent vs old discussions
-- Subreddit reputation (r/scams vs r/investing)
+- If HTML shows CRITICAL flags ('guaranteed profit', 'ponzi', 'wire transfer only'), increase confidence
+- Subreddit reputation matters (r/scams = high weight, r/investing = moderate)
 """
     
     try:
