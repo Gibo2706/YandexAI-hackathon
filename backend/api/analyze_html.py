@@ -32,6 +32,11 @@ def analyze_html_endpoint(html_content: str, k: int = 20) -> Dict[str, Any]:
         company_info = extract_company_info(extracted_data)
         search_query = build_search_query(extracted_data, company_info, html_keywords)
         
+        # DEBUG: log generisan query
+        print(f"\n🔍 Generated query: {search_query}")
+        print(f"📊 Algorithmic score: {html_keywords.get('algorithmic_score', 0)}/100")
+        print(f"🚨 Critical flags: {len([f for f in html_keywords.get('red_flags', []) if '🚨 CRITICAL' in f])}")
+        
         # 2. ISTI PIPELINE KAO /analyze - Reddit search
         search_results = search_similar_documents(
             query=search_query,
@@ -48,12 +53,18 @@ def analyze_html_endpoint(html_content: str, k: int = 20) -> Dict[str, Any]:
         # 3. Preprocess Reddit data (enrichment)
         preprocessed = preprocess_reddit_data(search_results, search_query)
         
-        # 4. Grok analysis - ISTI KAO /analyze (bez HTML context-a!)
+        # 4. Pripremi minimalan HTML context SAMO ako ima kritičnih flagova
+        html_context = None
+        critical_flags = [f for f in html_keywords.get('red_flags', []) if '🚨 CRITICAL' in f]
+        if critical_flags:
+            html_context = f"\n[HTML ANALYSIS] Website shows {len(critical_flags)} critical scam indicators.\n"
+        
+        # 5. Grok analysis
         analysis = analyze_with_grok(
             search_query, 
             search_results,
             use_preprocessing=True,
-            additional_context=None  # NE šaljemo HTML context
+            additional_context=html_context
         )
         
         # 5. OUTPUT - ISTI kao /analyze + dodatni HTML metadata

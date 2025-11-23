@@ -315,79 +315,39 @@ def extract_company_info(extracted_data: Dict[str, Any]) -> Dict[str, Any]:
 
 def build_search_query(extracted_data: Dict[str, Any], company_info: Dict[str, Any], scam_analysis: Dict[str, Any]) -> str:
     """
-    Kreira OPTIMIZOVAN query za embedding search koji ekstraktuje KLJUČNE informacije.
-    Cilj: Naći Reddit diskusije o ovom sajtu/kompaniji/proizvodu.
+    Kreira query za Reddit search - JEDNOSTAVAN i FOKUSIRAN.
     """
-    query_parts = []
-    
-    # 1. EKSTRAKTUJ DOMAIN iz linkova (najvažnija informacija!)
-    domain_name = None
-    links = extracted_data.get('links', [])
-    for link in links:
-        href = link.get('href', '')
-        # Traži self-referencing link ili homepage link
-        if href.startswith('http'):
-            # Extract domain iz URL-a
-            domain_match = re.search(r'https?://(?:www\.)?([^/]+)', href)
-            if domain_match:
-                domain_name = domain_match.group(1)
-                # Ukloni top-level domain ekstenziju za bolji query
-                domain_base = domain_name.split('.')[0] if '.' in domain_name else domain_name
-                query_parts.append(f"{domain_base} website reviews")
-                break
-    
-    # 2. COMPANY NAME iz title-a (clean)
+    # Prioritet: Title (najčešće sadrži naziv kompanije/sajta)
     title = extracted_data.get('title', '').strip()
-    if title and len(title) < 100:
-        # Ukloni common suffixe
-        clean_title = re.sub(r'\s*[-|–—].*$', '', title)  # Remove everything after dash
-        clean_title = re.sub(r'\s+(home|homepage|official|website).*$', '', clean_title, flags=re.IGNORECASE)
-        if clean_title and len(clean_title) > 3:
-            query_parts.append(f"{clean_title} scam or legit")
     
-    # 3. DESCRIPTION ako je informativan
-    description = extracted_data.get('description', '').strip()
-    if description and len(description) > 30 and len(description) < 200:
-        query_parts.append(description)
+    # Očisti title od common suffixes
+    clean_title = re.sub(r'\s*[-|–—].*$', '', title)  # Remove after dash
+    clean_title = re.sub(r'\s+(home|homepage|official|website|online).*$', '', clean_title, flags=re.IGNORECASE)
+    clean_title = clean_title.strip()
     
-    # 4. TOP 2 HEADINGS (često sadrže proizvode/usluge)
-    headings = extracted_data.get('headings', [])
-    if headings:
-        for heading in headings[:2]:
-            if len(heading) > 10 and len(heading) < 80:
-                query_parts.append(heading)
-                break
+    # Ako je title dobar, koristi ga
+    if clean_title and len(clean_title) > 3 and len(clean_title) < 100:
+        query = f"{clean_title} scam reviews reddit"
+    else:
+        # Fallback na description ili body text
+        description = extracted_data.get('description', '').strip()
+        if description and len(description) > 20:
+            query = f"{description[:150]} scam or legit"
+        else:
+            # Last resort - body text
+            body = extracted_data.get('body_text', '').strip()
+            query = f"{body[:150]} reviews"
     
-    # 5. KEYWORDS iz proizvoda/usluga
+    # Dodaj ključne reči ako su relevantne
     products = company_info.get('products_services', [])
-    if products:
-        # Prioritize crypto/investment keywords
-        priority_products = [p for p in products if p in ['crypto', 'investment', 'trading', 'course']]
-        if priority_products:
-            query_parts.append(f"{priority_products[0]} platform review")
+    if 'crypto' in products or 'investment' in products or 'trading' in products:
+        query += " investment platform"
     
-    # 6. SAMO AKO IMA CRITICAL RED FLAGS - dodaj to u query
-    red_flags = scam_analysis.get('red_flags', [])
-    critical_flags = [f for f in red_flags if '🚨 CRITICAL' in f]
-    if critical_flags and len(critical_flags) >= 2:
-        # Ako ima 2+ critical flags, dodaj opći scam warning u query
-        query_parts.append("scam warning fraud alert")
+    # Limit na 300 karaktera
+    if len(query) > 300:
+        query = query[:300]
     
-    # Kombinuj sve, prioritiziraj domain/title
-    query = ' '.join(query_parts[:4])  # Max 4 parts da ne bude predug
-    
-    # Cleanup
-    query = re.sub(r'\s+', ' ', query).strip()  # Remove multiple spaces
-    
-    # Limit na 400 karaktera
-    if len(query) > 400:
-        query = query[:400]
-    
-    # Fallback ako je query previše kratak
-    if len(query) < 20:
-        query = f"{title[:100]} website review"
-    
-    return query
+    return query.strip()
 
 
 def analyze_html_with_llm(extracted_data: Dict[str, Any], scam_analysis: Dict[str, Any], company_info: Dict[str, Any]) -> Dict[str, Any]:
