@@ -82,53 +82,67 @@ def analyze_html_endpoint(html_content: str, k: int = 20) -> Dict[str, Any]:
 def _build_html_context(extracted_data: Dict[str, Any], html_keywords: Dict[str, Any]) -> str:
     """
     Kreira dodatni kontekst iz HTML-a za Grok LLM.
-    Ovo se dodaje uz Reddit diskusije.
-    
-    LIMITIRAN na ~500 tokena (~2000 chars) da ne preoptereti context.
+    Ovo se dodaje uz Reddit diskusije kao DODATNI KONTEKST.
     """
     context = "\n" + "="*80 + "\n"
-    context += "ADDITIONAL CONTEXT FROM WEBSITE HTML:\n"
+    context += "SUPPLEMENTARY WEBSITE INFO (use as context, not primary evidence):\n"
     context += "="*80 + "\n\n"
     
-    # Page info (skraćeno)
+    # Page info
     title = extracted_data.get('title', 'N/A')
     if len(title) > 100:
         title = title[:100] + "..."
     
     description = extracted_data.get('description', 'N/A')
-    if len(description) > 150:
-        description = description[:150] + "..."
+    if len(description) > 120:
+        description = description[:120] + "..."
     
-    context += f"Website Title: {title}\n"
-    context += f"Meta Description: {description}\n\n"
+    context += f"Website: {title}\n"
+    if description != 'N/A':
+        context += f"Description: {description}\n"
+    context += "\n"
     
-    # Main headings (TOP 5, skraćeno)
+    # Main headings - pokazuje content structure
     headings = extracted_data.get('headings', [])
     if headings:
-        truncated_headings = [h[:50] for h in headings[:5]]  # Max 50 chars svaki
-        context += f"Main Headings: {', '.join(truncated_headings)}\n\n"
+        truncated_headings = [h[:50] for h in headings[:4]]  # Top 4
+        context += f"Page Headings: {', '.join(truncated_headings)}\n\n"
     
-    # HTML keyword findings - TOP 8 red flags (ne 10)
+    # KRITIČNI red flags (tier 1) - stvarne opasnosti
     red_flags = html_keywords.get('red_flags', [])
-    if red_flags:
-        context += f"WEBSITE RED FLAGS DETECTED ({len(red_flags)} total):\n"
-        for flag in red_flags[:8]:  # Top 8 (ne 10)
-            context += f"  • {flag}\n"
+    critical_flags = [f for f in red_flags if '🚨 CRITICAL' in f]
+    high_risk_flags = [f for f in red_flags if '⚠️ HIGH RISK' in f]
+    
+    # Prikaži kritične + top 3 high risk
+    important_flags = critical_flags[:5] + high_risk_flags[:3]
+    
+    if important_flags:
+        context += f"Website Warning Signs ({len(important_flags)} detected):\n"
+        for flag in important_flags:
+            # Očisti prefix emoji za čitljivost
+            clean_flag = flag.replace('🚨 CRITICAL: ', '').replace('⚠️ HIGH RISK: ', '')
+            context += f"  • {clean_flag}\n"
         context += "\n"
     
-    # Green flags - TOP 5 (ne 10)
+    # Green flags - top 4
     green_flags = html_keywords.get('green_flags', [])
     if green_flags:
-        context += f"WEBSITE TRUST SIGNALS ({len(green_flags)} total):\n"
-        for flag in green_flags[:5]:  # Top 5 (ne 10)
-            context += f"  • {flag}\n"
+        context += f"Website Trust Signals ({len(green_flags)} found):\n"
+        for flag in green_flags[:4]:  # Top 4
+            clean_flag = flag.replace('✅ TRUST: ', '')
+            context += f"  • {clean_flag}\n"
         context += "\n"
     
-    context += f"HTML Algorithmic Score: {html_keywords.get('algorithmic_score', 0)}/100\n"
+    # Algorithmic score - ali kao REFERENCE, ne definitivno
+    algo_score = html_keywords.get('algorithmic_score', 0)
+    context += f"Technical Analysis Score: {algo_score}/100 (reference only)\n\n"
+    
+    context += "⚠️ NOTE: Prioritize Reddit community experiences over technical findings.\n"
+    context += "Missing contact/legal pages are common in small businesses - not automatic red flags.\n"
     context += "="*80 + "\n\n"
     
-    # Safety check - max 2500 chars (~625 tokena)
-    if len(context) > 2500:
-        context = context[:2500] + "\n[Context truncated due to length]\n"
+    # Safety check - max 2000 chars (~500 tokena)
+    if len(context) > 2000:
+        context = context[:2000] + "\n[Truncated]\n"
     
     return context

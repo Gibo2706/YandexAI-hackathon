@@ -125,29 +125,34 @@ Your task:
 2. Detect scams, fraud, and suspicious activities using PROVIDED statistics
 3. Consider comment thread dynamics AND aggregate community sentiment
 4. Weight evidence by:
-   - Discussion credibility scores
+   - Discussion credibility scores (PRIMARY SOURCE)
    - Post quality metrics
    - Community consensus levels
    - Direct scam mention counts
    - Keyword analysis results
 5. Provide actionable risk assessment based on MULTIPLE data sources
-6. If WEBSITE HTML CONTEXT is provided at the top, consider it alongside Reddit data
+6. If WEBSITE HTML CONTEXT is provided, treat it as SUPPLEMENTARY INFO ONLY - Reddit community feedback is PRIMARY
 
 Return JSON with:
 {
   "scam_score": 0-100 (0=legitimate, 100=definite scam),
   "confidence": 0-100 (how certain are you based on evidence quality),
-  "summary": "2-3 sentence overview incorporating preprocessing insights",
+  "summary": "2-3 sentence overview FOCUSED ON REDDIT COMMUNITY FEEDBACK",
   "red_flags": ["warning sign 1", "warning sign 2", ...],
   "green_flags": ["positive indicator 1", ...],
   "key_points": ["important finding 1", "important finding 2", ...],
   "recommendation": "AVOID/HIGH_CAUTION/INVESTIGATE/LOW_RISK/LIKELY_SAFE",
   "debate_summary": "summary of disagreements in threads",
-  "reasoning": "detailed explanation using preprocessing stats, credibility scores, and keyword analysis"
+  "reasoning": "detailed explanation PRIORITIZING Reddit community sentiment over HTML technicalities"
 }
 
-IMPORTANT:
-- Use AGGREGATE STATISTICS provided at the top (discussion credibility, scam mentions, consensus)
+CRITICAL WEIGHTING:
+- Reddit community feedback = 70% weight
+- HTML technical findings = 30% weight
+- PRIORITIZE what real users say over missing contact forms or legal pages
+- Generic HTML issues (missing contact, no terms of service) are MINOR unless Reddit confirms problems
+- Focus on actual user experiences: withdrawal issues, fraud reports, positive reviews
+- Missing legal pages ≠ scam (many legitimate small businesses lack these)
 - Trust high-credibility discussions more than low-credibility ones
 - Consider keyword risk scores in your assessment
 - Community consensus (strong_agreement vs controversial) is a KEY signal
