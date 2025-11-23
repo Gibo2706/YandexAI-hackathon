@@ -1,0 +1,2307 @@
+{
+  "query": "is amazon scam or not",
+  "num_discussions_analyzed": 20,
+  "enriched_results": [
+    {
+      "similarity_score": 0.6020669937133789,
+      "full_doc": {
+        "post": {
+          "id": "xeg066",
+          "title": "Is this a scam?",
+          "text": "Is this a scam? I never use Amazon and have never signed up to it. But earlier this morning, I received this email and it has my real name so it’s quite bizarre. However, this email looks illegitimate to me. I’m just scared someone might be using my personal information.\n\nSo is this legit?",
+          "subreddit": "Scams",
+          "score": 5,
+          "num_comments": 9
+        },
+        "comments": [
+          {
+            "id": "iogs7j9",
+            "text": "I can't speak to the legitimacy of that e-mail (sender addresses can be spoofed, and embedded URLs in the body of e-mails can be misleading and malicious) but the domain &amp; website Amazon.in is definitely legitimate and run by Amazon. It's been around for many years, just like www.amazon.co.uk, www.amazon.ca, and others.\n\nhttps://www.whois.com/whois/amazon.in\n\nWhat you should NOT do is click on any links in that e-mail. If you need to check your account, manually type in the Amazon URL in your browser.",
+            "score": 6,
+            "subreddit": "Scams",
+            "parent_id": "xeg066"
+          },
+          {
+            "id": "iogjy23",
+            "text": "amazon.in ???!!!??\n\nSeriously man, think about it.",
+            "score": 5,
+            "subreddit": "Scams",
+            "parent_id": "xeg066"
+          },
+          {
+            "id": "iogntbr",
+            "text": "Obviously, yes",
+            "score": 2,
+            "subreddit": "Scams",
+            "parent_id": "xeg066"
+          },
+          {
+            "id": "iogkj4z",
+            "text": "[deleted]",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xeg066"
+          },
+          {
+            "id": "iogqzm8",
+            "text": "We get a couple questions about this exact prompt every month.",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xeg066"
+          },
+          {
+            "id": "iogz5ww",
+            "text": "Pacific daylight time? Never heard of it referred to like that 🤷🏽‍♂️",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xeg066"
+          },
+          {
+            "id": "ioh1v3l",
+            "text": "Ignore and move on. \n\nSince email addresses can be spoofed, if you get emails about potential threats or unidentified login attempt or pretty much anything from a site or subscription you do have, still don’t click on the links. Go to a bookmark you already have or put the web address in manually if you need to check on your account.",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xeg066"
+          }
+        ]
+      },
+      "submission_id": "xeg066",
+      "subreddit": "Scams",
+      "title": "Is this a scam?",
+      "score": 5,
+      "num_comments": 9,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 70,
+          "engagement_level": 9,
+          "karma": 5,
+          "content_length": 305,
+          "indicators": [
+            "Good engagement (7+ comments)",
+            "Some upvotes (5+ karma)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 35,
+          "karma_score": 5,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 7,
+          "reply_ratio": 0,
+          "avg_comment_score": 2.43,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 6,
+              "text_preview": "I can't speak to the legitimacy of that e-mail (sender addresses can be spoofed, and embedded URLs i"
+            },
+            {
+              "author": "unknown",
+              "score": 5,
+              "text_preview": "amazon.in ???!!!??\n\nSeriously man, think about it."
+            },
+            {
+              "author": "unknown",
+              "score": 2,
+              "text_preview": "Obviously, yes"
+            }
+          ],
+          "total_comments": 7
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Is this a scam? Is this a scam? I never use Amazon and have never signed up to it"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [
+            "legit",
+            "legitimate"
+          ],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 2
+        },
+        "discussion_credibility": 47.93,
+        "avg_comment_credibility": 31.43,
+        "total_comments_analyzed": 7
+      }
+    },
+    {
+      "similarity_score": 0.5853543281555176,
+      "full_doc": {
+        "post": {
+          "id": "xnv2rx",
+          "title": "Amazon scam?",
+          "text": "Amazon scam? ",
+          "subreddit": "Scams",
+          "score": 3,
+          "num_comments": 12
+        },
+        "comments": [
+          {
+            "id": "ipvocon",
+            "text": "You can always just verify with 100% certainty if a message came from Amazon itself by checking in the message center in the Amazon app or on the website. If Amazon sent it, there will be a copy there. \n\nhttps://www.amazon.com/gp/aw/message?ie=UTF8&amp;ref_=ya_d_l_msg_center#!/inbox\n\nIn the Amazon app, just go to \"Your account\" and scroll down the \"message center\".\n\nAmazon archives every single message they send you there. If it is there it came from Amazon, if it isn't it did not.",
+            "score": 8,
+            "subreddit": "Scams",
+            "parent_id": "xnv2rx"
+          },
+          {
+            "id": "ipvdo4u",
+            "text": "Free trials for Prime and/or Amazon Music are very common. Just double check the link goes to Amazon.",
+            "score": 7,
+            "subreddit": "Scams",
+            "parent_id": "xnv2rx"
+          },
+          {
+            "id": "ipvivbw",
+            "text": "Might be real. Scam part is that it renews and bills you automatically if you don't cancel after the trial period. They got me like that for a few months, I should've set a reminder",
+            "score": 7,
+            "subreddit": "Scams",
+            "parent_id": "xnv2rx"
+          },
+          {
+            "id": "ipvex4y",
+            "text": "The order number takes me to my order details, so I assume the other link will take me to Amazon too but I’ll check! I just didnt want to click it before I got another opinion first",
+            "score": 3,
+            "subreddit": "Scams",
+            "parent_id": "xnv2rx"
+          },
+          {
+            "id": "ipxlr7w",
+            "text": "Sounds like every subscription service ever tbh",
+            "score": 3,
+            "subreddit": "Scams",
+            "parent_id": "xnv2rx"
+          },
+          {
+            "id": "ipvdisc",
+            "text": "For context I had made an Amazon purchase, and the order number takes me to my order, however I don’t know if this is a scam tagging on to my order or if this is a real email from Amazon? The email it comes from is store-news@amazon.com.",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xnv2rx"
+          },
+          {
+            "id": "ipvdkwv",
+            "text": "[deleted]",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xnv2rx"
+          }
+        ]
+      },
+      "submission_id": "xnv2rx",
+      "subreddit": "Scams",
+      "title": "Amazon scam?",
+      "score": 3,
+      "num_comments": 12,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 60,
+          "engagement_level": 12,
+          "karma": 3,
+          "content_length": 25,
+          "indicators": [
+            "High engagement (10+ comments)",
+            "Very short post (<50 chars)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 3,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 7,
+          "reply_ratio": 0,
+          "avg_comment_score": 4.29,
+          "debate_intensity": "low",
+          "consensus_level": "strong_agreement",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 8,
+              "text_preview": "You can always just verify with 100% certainty if a message came from Amazon itself by checking in t"
+            },
+            {
+              "author": "unknown",
+              "score": 7,
+              "text_preview": "Free trials for Prime and/or Amazon Music are very common. Just double check the link goes to Amazon"
+            },
+            {
+              "author": "unknown",
+              "score": 7,
+              "text_preview": "Might be real. Scam part is that it renews and bills you automatically if you don't cancel after the"
+            }
+          ],
+          "total_comments": 7
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Amazon scam? Amazon scam?  You can always just verify with 100% certainty if a message came from Amazon itself by checking in the message center in th"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 0
+        },
+        "discussion_credibility": 42.64,
+        "avg_comment_credibility": 32.14,
+        "total_comments_analyzed": 7
+      }
+    },
+    {
+      "similarity_score": 0.5711550116539001,
+      "full_doc": {
+        "post": {
+          "id": "xox6un",
+          "title": "Scam?",
+          "text": "Scam? [deleted]",
+          "subreddit": "Scams",
+          "score": 2,
+          "num_comments": 4
+        },
+        "comments": [
+          {
+            "id": "iq0zv83",
+            "text": "Common refund scam, Amazon won't call you like this.",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xox6un"
+          },
+          {
+            "id": "iq0zvzr",
+            "text": "Yes. \n\nIt is, as they say, \"the bad Amazon\".",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xox6un"
+          },
+          {
+            "id": "iq0zw6c",
+            "text": "Yep, a bad one too",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xox6un"
+          },
+          {
+            "id": "iq0zz3s",
+            "text": "[deleted]",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xox6un"
+          },
+          {
+            "id": "iq106qe",
+            "text": "Just a common scam refund scam run out of call centers in India.",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xox6un"
+          }
+        ]
+      },
+      "submission_id": "xox6un",
+      "subreddit": "Scams",
+      "title": "Scam?",
+      "score": 2,
+      "num_comments": 4,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 30,
+          "engagement_level": 4,
+          "karma": 2,
+          "content_length": 20,
+          "indicators": [
+            "Moderate engagement (4+ comments)",
+            "Very short post (<50 chars)",
+            "Content removed/deleted"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 2,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 5,
+          "reply_ratio": 0,
+          "avg_comment_score": 1,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "Common refund scam, Amazon won't call you like this."
+            },
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "Yes. \n\nIt is, as they say, \"the bad Amazon\"."
+            },
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "Yep, a bad one too"
+            }
+          ],
+          "total_comments": 5
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Scam? Scam? [deleted] Common refund scam, Amazon won't call you like this"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 0
+        },
+        "discussion_credibility": 30,
+        "avg_comment_credibility": 30,
+        "total_comments_analyzed": 5
+      }
+    },
+    {
+      "similarity_score": 0.5677316188812256,
+      "full_doc": {
+        "post": {
+          "id": "xhy741",
+          "title": "This is a scam, right?",
+          "text": "This is a scam, right? [deleted]",
+          "subreddit": "Scams",
+          "score": 3,
+          "num_comments": 2
+        },
+        "comments": [
+          {
+            "id": "ip0bngd",
+            "text": "!review scam I believe",
+            "score": 2,
+            "subreddit": "Scams",
+            "parent_id": "xhy741"
+          },
+          {
+            "id": "ip0bnhv",
+            "text": "AutoModerator has been summoned to explain the Amazon review scam (credit to user SuwanneeValleyGirl). Amazon review scammers are trying to buy 5 star reviews without looking like they’re buying 5 star reviews. A long time ago, sellers could offer free or discounted coupon codes to buyers in exchange for an “honest” review. [This practice was banned in 2016](https://blog.aboutamazon.com/innovation/update-on-customer-reviews), replaced by Amazon’s Vine program. [FTC rules](https://www.ftc.gov/news-events/press-releases/2009/10/ftc-publishes-final-guides-governing-endorsements-testimonials) also dictate that any reviews or product promotions obtained in this way have to be clearly labeled as such. To get around both the FTC’s labeling rules and Amazon’s ban, there are websites and private Facebook groups that link together shady sellers with people willing to sell positive reviews. These shady sellers are usually Chinese, selling cheap products that would otherwise not receive positive reviews (or many purchases at all) naturally. They gave you those strange instructions of clicking [this] first, then clicking [their product] to make your selection of their product look more organic to the algorithm. You pay for it in full on Amazon, then are reimbursed via PayPal (which Amazon famously doesn’t use) to hide the transaction. If you don’t like the product, they do the return on Amazon to make them look like good, true-to-their-word sellers to the algorithm. But most people will just take the PayPal refund and hand over the 5 star review. Here’s an excellent [article](https://www.buzzfeednews.com/article/nicolenguyen/her-amazon-purchases-are-real-the-reviews-are-fake) describing in-depth how this process works. One should never trust an Amazon (or other merchant's) review - carefully research the products they purchase instead. Of course, there’s always the chance that an Amazon Review scam is just a scam and they’ll just take your money and run.\n\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/Scams) if you have any questions or concerns.*",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xhy741"
+          }
+        ]
+      },
+      "submission_id": "xhy741",
+      "subreddit": "Scams",
+      "title": "This is a scam, right?",
+      "score": 3,
+      "num_comments": 2,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 35,
+          "engagement_level": 2,
+          "karma": 3,
+          "content_length": 54,
+          "indicators": [
+            "Some engagement (2-3 comments)",
+            "Content removed/deleted"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 3,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 2,
+          "reply_ratio": 0,
+          "avg_comment_score": 1.5,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 2,
+              "text_preview": "!review scam I believe"
+            },
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "AutoModerator has been summoned to explain the Amazon review scam (credit to user SuwanneeValleyGirl"
+            }
+          ],
+          "total_comments": 2
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "This is a scam, right? This is a scam, right? [deleted] !review scam I believe AutoModerator has been summoned to explain the Amazon review scam (cred"
+            },
+            {
+              "keyword": "fake",
+              "context": "com/article/nicolenguyen/her-amazon-purchases-are-real-the-reviews-are-fake) describing in-depth how this process works"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [],
+          "scam_mention_count": 2,
+          "warning_count": 0,
+          "positive_count": 0
+        },
+        "discussion_credibility": 32,
+        "avg_comment_credibility": 30,
+        "total_comments_analyzed": 2
+      }
+    },
+    {
+      "similarity_score": 0.5661998987197876,
+      "full_doc": {
+        "post": {
+          "id": "xhgwng",
+          "title": "Scam, right?",
+          "text": "Scam, right? ",
+          "subreddit": "Scams",
+          "score": 126,
+          "num_comments": 35
+        },
+        "comments": [
+          {
+            "id": "ioy5ktc",
+            "text": "After some of the comments and some googling, I feel like it is legit. Either way, I’m not going to click the link because I did get my packages, so I’m not going to risk it just in case. For what it’s worth, I did go to the app and there is no message for me that I can find. I order from Amazon a lot and have never received this text before, which is why I was hesitant.",
+            "score": 44,
+            "subreddit": "Scams",
+            "parent_id": "xhgwng"
+          },
+          {
+            "id": "ioyjn72",
+            "text": "This is how is Amazon flex drivers get ahold of a customer if we have a delivery issue or need a code to get in to an apartment building.",
+            "score": 34,
+            "subreddit": "Scams",
+            "parent_id": "xhgwng"
+          },
+          {
+            "id": "ioy7fbd",
+            "text": "I did a search for a(.)co in urlscan(.)io and this domain appears to be a legitimate Amazon domain. I do not like that the domain is not openly registered to Amazon. The Whois data is all redacted. Just use the app",
+            "score": 29,
+            "subreddit": "Scams",
+            "parent_id": "xhgwng"
+          },
+          {
+            "id": "ioy27b2",
+            "text": "It's possible this is real, based on the feedback. But the same information is available in the app, so you never need to click on links sent via text.",
+            "score": 23,
+            "subreddit": "Scams",
+            "parent_id": "xhgwng"
+          },
+          {
+            "id": "ioxeyzp",
+            "text": "a.co is apparently a legit domain owned by Amazon and has been for some time\n\nhttps://techcrunch.com/2011/05/17/amazon-buys-the-a-co-z-co-k-co-and-cloud-co-domains/",
+            "score": 15,
+            "subreddit": "Scams",
+            "parent_id": "xhgwng"
+          },
+          {
+            "id": "ioycqil",
+            "text": "I got one, and I'm pretty sure it's a scam. I do shop at Amazon but I didn't order anything for a month and got one of these messages, I just ignored it, nothing happened.",
+            "score": 12,
+            "subreddit": "Scams",
+            "parent_id": "xhgwng"
+          },
+          {
+            "id": "ioxfvhc",
+            "text": "Nope, it's not.  It looks shady as hell and I didn't trust it either at first but it's real.\n\nThey don't know your number and that's why it uses this weird convoluted messaging system.\n\nThe message should have come from shortcode 262966 and like I mentioned in another reply, a.co is a real domain owned by Amazon",
+            "score": 9,
+            "subreddit": "Scams",
+            "parent_id": "xhgwng"
+          }
+        ]
+      },
+      "submission_id": "xhgwng",
+      "subreddit": "Scams",
+      "title": "Scam, right?",
+      "score": 126,
+      "num_comments": 35,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 80,
+          "engagement_level": 35,
+          "karma": 126,
+          "content_length": 25,
+          "indicators": [
+            "High engagement (10+ comments)",
+            "Highly upvoted (50+ karma)",
+            "Very short post (<50 chars)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 45,
+          "karma_score": 126,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 7,
+          "reply_ratio": 0,
+          "avg_comment_score": 23.71,
+          "debate_intensity": "low",
+          "consensus_level": "strong_agreement",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 44,
+              "text_preview": "After some of the comments and some googling, I feel like it is legit. Either way, I’m not going to "
+            },
+            {
+              "author": "unknown",
+              "score": 34,
+              "text_preview": "This is how is Amazon flex drivers get ahold of a customer if we have a delivery issue or need a cod"
+            },
+            {
+              "author": "unknown",
+              "score": 29,
+              "text_preview": "I did a search for a(.)co in urlscan(.)io and this domain appears to be a legitimate Amazon domain. "
+            }
+          ],
+          "total_comments": 7
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Scam, right? Scam, right?  After some of the comments and some googling, I feel like it is legit"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [
+            "legit",
+            "legitimate"
+          ],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 2
+        },
+        "discussion_credibility": 58.14,
+        "avg_comment_credibility": 42.14,
+        "total_comments_analyzed": 7
+      }
+    },
+    {
+      "similarity_score": 0.5636729001998901,
+      "full_doc": {
+        "post": {
+          "id": "xm890p",
+          "title": "Is this a scam? Amazon DE.",
+          "text": "Is this a scam? Amazon DE. [deleted]",
+          "subreddit": "PS5restock",
+          "score": 3,
+          "num_comments": 3
+        },
+        "comments": [
+          {
+            "id": "ipn2l3e",
+            "text": "Yeah, it's a scam. A hacked account",
+            "score": 2,
+            "subreddit": "PS5restock",
+            "parent_id": "xm890p"
+          },
+          {
+            "id": "ippbadd",
+            "text": "They are not selling PS5. Their site have been hacked... so that\\`s a fake",
+            "score": 1,
+            "subreddit": "PS5restock",
+            "parent_id": "xm890p"
+          },
+          {
+            "id": "ippbc3r",
+            "text": "[Zauberdeko.de](https://Zauberdeko.de) is not selling PS5. Their site have been hacked. So that offer is a fake...",
+            "score": 1,
+            "subreddit": "PS5restock",
+            "parent_id": "xm890p"
+          }
+        ]
+      },
+      "submission_id": "xm890p",
+      "subreddit": "PS5restock",
+      "title": "Is this a scam? Amazon DE.",
+      "score": 3,
+      "num_comments": 3,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 35,
+          "engagement_level": 3,
+          "karma": 3,
+          "content_length": 62,
+          "indicators": [
+            "Some engagement (2-3 comments)",
+            "Content removed/deleted"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 3,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 3,
+          "reply_ratio": 0,
+          "avg_comment_score": 1.33,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 2,
+              "text_preview": "Yeah, it's a scam. A hacked account"
+            },
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "They are not selling PS5. Their site have been hacked... so that\\`s a fake"
+            },
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "[Zauberdeko.de](https://Zauberdeko.de) is not selling PS5. Their site have been hacked. So that offe"
+            }
+          ],
+          "total_comments": 3
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Is this a scam? Amazon DE"
+            },
+            {
+              "keyword": "fake",
+              "context": "so that\\`s a fake [Zauberdeko"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [],
+          "scam_mention_count": 2,
+          "warning_count": 0,
+          "positive_count": 0
+        },
+        "discussion_credibility": 32,
+        "avg_comment_credibility": 30,
+        "total_comments_analyzed": 3
+      }
+    },
+    {
+      "similarity_score": 0.5554081201553345,
+      "full_doc": {
+        "post": {
+          "id": "xedpzp",
+          "title": "\"your amazon billing account is under review\" is this a scam?",
+          "text": "\"your amazon billing account is under review\" is this a scam? Hey y'all I don't know if anyone can help me out with this but I just got this text from like a named text saying notification something saying my account is under review and suspended for the time being. The text has a link for me to click so I'm wonder is this legit, or is this a phishing scam? Thought I'd swing by and ask here so if anyone has any answers I'd greatly appreciate it. Thanks!",
+          "subreddit": "Scams",
+          "score": 2,
+          "num_comments": 6
+        },
+        "comments": [
+          {
+            "id": "iog7stq",
+            "text": "Idk if being an Affiliate on Twitch counts as seller but otherwise no. I did at one point, self-published books, but have since stopped selling and closed shop, and that was over half a decade ago so idk why this would pop up now.  \n\n\nThank you though, I will sign in and check it out.",
+            "score": 3,
+            "subreddit": "Scams",
+            "parent_id": "xedpzp"
+          },
+          {
+            "id": "iogdbpj",
+            "text": "Not necessary. These are phishing texts. One only needs to login to their account directly and check for suspicious activity.",
+            "score": 3,
+            "subreddit": "Scams",
+            "parent_id": "xedpzp"
+          },
+          {
+            "id": "iog7drn",
+            "text": "Scam",
+            "score": 2,
+            "subreddit": "Scams",
+            "parent_id": "xedpzp"
+          },
+          {
+            "id": "ioghk21",
+            "text": "Typically the link goes to a domain that doesn't belong to Amazon, which makes the scam clear.",
+            "score": 2,
+            "subreddit": "Scams",
+            "parent_id": "xedpzp"
+          },
+          {
+            "id": "iog7ep3",
+            "text": "are you an amazon seller?\n\nhttps://blog.bobsledmarketing.com/blog/amazon-account-under-review-recovery-guide\n\n*'Account Under Review’ means that a seller’s selling privileges have been removed temporarily.  Customers will not be able to purchase their products on Amazon until the condition that caused the suspension is resolved. Please note that ‘under review’ is not the same as ‘banned’. With a suspension, you still have an opportunity to appeal.*\n\ni still wouldn't click the link. i'd just sign in to the account directly to see if there's an alert confirming that.",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xedpzp"
+          },
+          {
+            "id": "iog7iqf",
+            "text": "Call Amazon customer service right away, when you receive something like that.",
+            "score": 0,
+            "subreddit": "Scams",
+            "parent_id": "xedpzp"
+          }
+        ]
+      },
+      "submission_id": "xedpzp",
+      "subreddit": "Scams",
+      "title": "\"your amazon billing account is under review\" is this a scam?",
+      "score": 2,
+      "num_comments": 6,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 65,
+          "engagement_level": 6,
+          "karma": 2,
+          "content_length": 518,
+          "indicators": [
+            "Moderate engagement (4+ comments)",
+            "Substantial post (500+ chars)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 2,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 6,
+          "reply_ratio": 0,
+          "avg_comment_score": 1.83,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 3,
+              "text_preview": "Idk if being an Affiliate on Twitch counts as seller but otherwise no. I did at one point, self-publ"
+            },
+            {
+              "author": "unknown",
+              "score": 3,
+              "text_preview": "Not necessary. These are phishing texts. One only needs to login to their account directly and check"
+            },
+            {
+              "author": "unknown",
+              "score": 2,
+              "text_preview": "Scam"
+            }
+          ],
+          "total_comments": 6
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "\"your amazon billing account is under review\" is this a scam? \"your amazon billing account is under review\" is this a scam? Hey y'all I don't know if "
+            },
+            {
+              "keyword": "phishing",
+              "context": "The text has a link for me to click so I'm wonder is this legit, or is this a phishing scam? Thought I'd swing by and ask here so if anyone has any an"
+            }
+          ],
+          "fraud_indicators": [
+            "suspicious"
+          ],
+          "positive_vouches": [
+            "legit"
+          ],
+          "scam_mention_count": 2,
+          "warning_count": 1,
+          "positive_count": 1
+        },
+        "discussion_credibility": 43.5,
+        "avg_comment_credibility": 28.33,
+        "total_comments_analyzed": 6
+      }
+    },
+    {
+      "similarity_score": 0.5384854078292847,
+      "full_doc": {
+        "post": {
+          "id": "x8kfv8",
+          "title": "is this a legit amazon email or scam",
+          "text": "is this a legit amazon email or scam ",
+          "subreddit": "Scams",
+          "score": 68,
+          "num_comments": 89
+        },
+        "comments": [
+          {
+            "id": "iniyf5x",
+            "text": "When in doubt go to the actual site and logon.",
+            "score": 128,
+            "subreddit": "Scams",
+            "parent_id": "x8kfv8"
+          },
+          {
+            "id": "initkz7",
+            "text": "Ok after just resetting my password i think the email was a scam maybe. Weird its .fr and a US location prob vpn subject is copied but the actual email itself is different\n\nEdit: nah i was wrong its a legit email full carbon copy of the email i got just now when confirming my own device so someone genuinely did almost get into my account pass gonna be changed gg bitch nice try",
+            "score": 54,
+            "subreddit": "Scams",
+            "parent_id": "x8kfv8"
+          },
+          {
+            "id": "iniyljn",
+            "text": "This. Except i did it through the app instead of through the site",
+            "score": 48,
+            "subreddit": "Scams",
+            "parent_id": "x8kfv8"
+          },
+          {
+            "id": "iniz6l0",
+            "text": "I make sure any online account that has payment info uses 2-step Auth. I use an auth app on my phone so I don't have to mess with text codes. I work in IT, and many of my work accounts manage domains for my organization that contain personal info for about 1500 people. All those accounts have randomly generated 30 character passwords stored in my password manager, and also use 2-step authentication. It's almost impossible to crack an account setup this way, so I can safely ignore any notifications that someone is attempting to log into my account.\n\nOne more thing, if you use text codes as 2-step Auth, make sure your cell service account also has a password or PIN number on it, like if you lost your phone and had to get another one, you would have to call your provider to switch your number over to the new phone. Your cellular provider probably already requires that you set up a PIN for your account, but if you're unsure, call them and check. Some scammers buy stacks of SIM cards and call the provider to have your number switched over to their burner, then use it to intercept the text code that's sent when logging in.",
+            "score": 28,
+            "subreddit": "Scams",
+            "parent_id": "x8kfv8"
+          },
+          {
+            "id": "iniuvsr",
+            "text": "Also removed my payment methods from the account as well and address",
+            "score": 22,
+            "subreddit": "Scams",
+            "parent_id": "x8kfv8"
+          },
+          {
+            "id": "iniufmd",
+            "text": "Did you reset your password through the actual Amazon website or app?",
+            "score": 15,
+            "subreddit": "Scams",
+            "parent_id": "x8kfv8"
+          },
+          {
+            "id": "initli6",
+            "text": "Clicking on links that you're not sure are safe is generally not an advisable way to find out if they're safe.. lol",
+            "score": 13,
+            "subreddit": "Scams",
+            "parent_id": "x8kfv8"
+          }
+        ]
+      },
+      "submission_id": "x8kfv8",
+      "subreddit": "Scams",
+      "title": "is this a legit amazon email or scam",
+      "score": 68,
+      "num_comments": 89,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 90,
+          "engagement_level": 89,
+          "karma": 68,
+          "content_length": 73,
+          "indicators": [
+            "High engagement (10+ comments)",
+            "Highly upvoted (50+ karma)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 45,
+          "karma_score": 68,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 7,
+          "reply_ratio": 0,
+          "avg_comment_score": 44,
+          "debate_intensity": "low",
+          "consensus_level": "strong_agreement",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 128,
+              "text_preview": "When in doubt go to the actual site and logon."
+            },
+            {
+              "author": "unknown",
+              "score": 54,
+              "text_preview": "Ok after just resetting my password i think the email was a scam maybe. Weird its .fr and a US locat"
+            },
+            {
+              "author": "unknown",
+              "score": 48,
+              "text_preview": "This. Except i did it through the app instead of through the site"
+            }
+          ],
+          "total_comments": 7
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "is this a legit amazon email or scam is this a legit amazon email or scam  When in doubt go to the actual site and logon"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [
+            "legit"
+          ],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 1
+        },
+        "discussion_credibility": 62.57,
+        "avg_comment_credibility": 43.57,
+        "total_comments_analyzed": 7
+      }
+    },
+    {
+      "similarity_score": 0.5353338122367859,
+      "full_doc": {
+        "post": {
+          "id": "x3lgho",
+          "title": "Amazon scam",
+          "text": "Amazon scam ",
+          "subreddit": "ScamNumbers",
+          "score": 5,
+          "num_comments": 1
+        },
+        "comments": [
+          {
+            "id": "imq4h0v",
+            "text": "Hey, Automod here! It's always a good idea to check any above number(s) on [a carrier lookup tool](https://www.scout.tel/phone-number-lookup) before calling them to avoid calling a legitimate business, residential number, or private cell number. To do this, lookup the phone number on the carrier lookup and look at the results. If the results says that the number belongs to a residential carrier (ex. AT&amp;T/\"Cingular Wireless\", Verizon Wireless, Metro PCS, Rogers, etc.), *DO NOT* call the number. If the post is still up, please report the post so a mod can remove it to prevent innocent people from receiving these calls.    \n\nThe above also applies to comments that have numbers too. Thanks!\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/ScamNumbers) if you have any questions or concerns.*",
+            "score": 1,
+            "subreddit": "ScamNumbers",
+            "parent_id": "x3lgho"
+          }
+        ]
+      },
+      "submission_id": "x3lgho",
+      "subreddit": "ScamNumbers",
+      "title": "Amazon scam",
+      "score": 5,
+      "num_comments": 1,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 35,
+          "engagement_level": 1,
+          "karma": 5,
+          "content_length": 23,
+          "indicators": [
+            "Low engagement (<2 comments)",
+            "Some upvotes (5+ karma)",
+            "Very short post (<50 chars)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 35,
+          "karma_score": 5,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 1,
+          "reply_ratio": 0,
+          "avg_comment_score": 1,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "Hey, Automod here! It's always a good idea to check any above number(s) on [a carrier lookup tool](h"
+            }
+          ],
+          "total_comments": 1
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Amazon scam Amazon scam  Hey, Automod here! It's always a good idea to check any above number(s) on [a carrier lookup tool](https://www"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [
+            "legit",
+            "legitimate"
+          ],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 2
+        },
+        "discussion_credibility": 33.5,
+        "avg_comment_credibility": 30,
+        "total_comments_analyzed": 1
+      }
+    },
+    {
+      "similarity_score": 0.534633457660675,
+      "full_doc": {
+        "post": {
+          "id": "xcnvii",
+          "title": "Is this a scam? On Amazon.ca , its a promoted post...",
+          "text": "Is this a scam? On Amazon.ca , its a promoted post... ",
+          "subreddit": "PS5restock",
+          "score": 2,
+          "num_comments": 2
+        },
+        "comments": [
+          {
+            "id": "io66w7f",
+            "text": "Looks sketchy to me. I advise buying through Walmart, PS direct etc. If buying through Amazon, only if the console is sold by Amazon, which is only via invitation right now",
+            "score": 5,
+            "subreddit": "PS5restock",
+            "parent_id": "xcnvii"
+          },
+          {
+            "id": "io6g1j3",
+            "text": "Thank you! Do you know how to get an invitation on Amazon? I’m in Canada so it’s a little harder to find",
+            "score": 2,
+            "subreddit": "PS5restock",
+            "parent_id": "xcnvii"
+          }
+        ]
+      },
+      "submission_id": "xcnvii",
+      "subreddit": "PS5restock",
+      "title": "Is this a scam? On Amazon.ca , its a promoted post...",
+      "score": 2,
+      "num_comments": 2,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 55,
+          "engagement_level": 2,
+          "karma": 2,
+          "content_length": 107,
+          "indicators": [
+            "Some engagement (2-3 comments)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 2,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 2,
+          "reply_ratio": 0,
+          "avg_comment_score": 3.5,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 5,
+              "text_preview": "Looks sketchy to me. I advise buying through Walmart, PS direct etc. If buying through Amazon, only "
+            },
+            {
+              "author": "unknown",
+              "score": 2,
+              "text_preview": "Thank you! Do you know how to get an invitation on Amazon? I’m in Canada so it’s a little harder to "
+            }
+          ],
+          "total_comments": 2
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Is this a scam? On Amazon"
+            }
+          ],
+          "fraud_indicators": [
+            "sketchy"
+          ],
+          "positive_vouches": [],
+          "scam_mention_count": 1,
+          "warning_count": 1,
+          "positive_count": 0
+        },
+        "discussion_credibility": 40.75,
+        "avg_comment_credibility": 32.5,
+        "total_comments_analyzed": 2
+      }
+    },
+    {
+      "similarity_score": 0.5301820039749146,
+      "full_doc": {
+        "post": {
+          "id": "x51d2e",
+          "title": "Fake Amazon Scam!!!",
+          "text": "Fake Amazon Scam!!! I got this unprofessional looking text from and email. I called Amazon customer support, they were kind and quick, and turns out it 100% and scam. If you get an email like this please don't answer.",
+          "subreddit": "Scams",
+          "score": 6,
+          "num_comments": 3
+        },
+        "comments": [
+          {
+            "id": "imyskk2",
+            "text": "BE CAREFUL! **PHISHING ALERT!** \n\n I'm a bot from Trend Micro and the link www.2xstudios.com/free/amz31/support/?=324600 has **Phishing threats**. \n [Check detection detail](https://tmcheck.us/CmakVmbV) \n\n Try Trend Micro Check, a scam detection tool [here](https://api.link.trendmicro.com/events/landing-page?product_id=4cc29&amp;source=reddit_bot&amp;page=phishing&amp;custom_id=t3_x51d2e) .\n\nHave feedback about the service? [Contact us](https://tmcheck.us/9UtqnnHp).",
+            "score": 2,
+            "subreddit": "Scams",
+            "parent_id": "x51d2e"
+          },
+          {
+            "id": "imysm9f",
+            "text": "I got the exact same message. The website domain is different but the rest of the address is the same (i.e. /free/amz31/support). Yes, it's a scam.",
+            "score": 2,
+            "subreddit": "Scams",
+            "parent_id": "x51d2e"
+          },
+          {
+            "id": "in1ejpo",
+            "text": "r/engrish",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "x51d2e"
+          }
+        ]
+      },
+      "submission_id": "x51d2e",
+      "subreddit": "Scams",
+      "title": "Fake Amazon Scam!!!",
+      "score": 6,
+      "num_comments": 3,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 60,
+          "engagement_level": 3,
+          "karma": 6,
+          "content_length": 236,
+          "indicators": [
+            "Some engagement (2-3 comments)",
+            "Some upvotes (5+ karma)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 35,
+          "karma_score": 6,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 3,
+          "reply_ratio": 0,
+          "avg_comment_score": 1.67,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 2,
+              "text_preview": "BE CAREFUL! **PHISHING ALERT!** \n\n I'm a bot from Trend Micro and the link www.2xstudios.com/free/am"
+            },
+            {
+              "author": "unknown",
+              "score": 2,
+              "text_preview": "I got the exact same message. The website domain is different but the rest of the address is the sam"
+            },
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "r/engrish"
+            }
+          ],
+          "total_comments": 3
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Fake Amazon Scam!!! Fake Amazon Scam!!! I got this unprofessional looking text from and email"
+            },
+            {
+              "keyword": "fake",
+              "context": "Fake Amazon Scam!!! Fake Amazon Scam!!! I got this unprofessional looking text from and email"
+            },
+            {
+              "keyword": "phishing",
+              "context": "BE CAREFUL! **PHISHING ALERT!** \n\n I'm a bot from Trend Micro and the link www"
+            }
+          ],
+          "fraud_indicators": [
+            "be careful"
+          ],
+          "positive_vouches": [],
+          "scam_mention_count": 3,
+          "warning_count": 1,
+          "positive_count": 0
+        },
+        "discussion_credibility": 43.5,
+        "avg_comment_credibility": 30,
+        "total_comments_analyzed": 3
+      }
+    },
+    {
+      "similarity_score": 0.5255073308944702,
+      "full_doc": {
+        "post": {
+          "id": "xnjtgo",
+          "title": "It this a scam?",
+          "text": "It this a scam? ",
+          "subreddit": "wotv_ffbe",
+          "score": 2,
+          "num_comments": 0
+        },
+        "comments": []
+      },
+      "submission_id": "xnjtgo",
+      "subreddit": "wotv_ffbe",
+      "title": "It this a scam?",
+      "score": 2,
+      "num_comments": 0,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 30,
+          "engagement_level": 0,
+          "karma": 2,
+          "content_length": 31,
+          "indicators": [
+            "Low engagement (<2 comments)",
+            "Very short post (<50 chars)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 2,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 0,
+          "consensus_level": "no_comments",
+          "top_contributors": [],
+          "total_comments": 0
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "It this a scam? It this a scam?"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 0
+        },
+        "discussion_credibility": 21,
+        "avg_comment_credibility": 0,
+        "total_comments_analyzed": 0
+      }
+    },
+    {
+      "similarity_score": 0.524198055267334,
+      "full_doc": {
+        "post": {
+          "id": "xjd6ba",
+          "title": "New Amazon Scam",
+          "text": "New Amazon Scam ",
+          "subreddit": "Scams",
+          "score": 4,
+          "num_comments": 4
+        },
+        "comments": [
+          {
+            "id": "ip7mlxk",
+            "text": "I would report that seller to Amazon. It is a sleazy Chinese seller impersonating Amazon to try to get you to remove a negative review. That is enough to get them banned from Amazon for review manipulation.",
+            "score": 3,
+            "subreddit": "Scams",
+            "parent_id": "xjd6ba"
+          },
+          {
+            "id": "ip7o29u",
+            "text": "It is a seller (the one that sells the item they link to a review for) but they apparently got bad intel from the service they paid to try to track down the person who left the negative review and ended up emailing you instead. \n\nI have gotten similar emails as well as postcards in the mail from China trying to bribe me to remove negative or even neutral (3*) reviews. The sellers are not supposed to get any buyer's actual email address (Amazon gives them an coded email address that they generate) and in my case with the post cards I had ordered the items FBA so the Chinese seller was not supposed to ever know my address. They hire companies that bribe Amazon employees based in China to give them buyer information.\n\nThe review was already removed so they may have sent the email to multiple people because they were not sure which one was the correct person. Unfortunately it looks like the buyer who left the review took the seller up on their bribe. \n\nThe item is a baby bottle warmer that until recently had a lot of negative reviews. \n\nhttps://www.amazon.com/Portable-Adapters-Rechargeable-Temperature-Breastmilk/dp/B09V7QZZ46\n\nThis is the Chinese seller that sent the email. https://www.amazon.com/sp?ie=UTF8&amp;seller=A1IUEQVFJDM3PE&amp;asin=B09V7QZZ46&amp;ref_=dp_merchant_link&amp;isAmazonFulfilled=1",
+            "score": 3,
+            "subreddit": "Scams",
+            "parent_id": "xjd6ba"
+          },
+          {
+            "id": "ip7mv28",
+            "text": "It's not a seller. Never left a bad review or any reviews. If you take a look at the order information, they left it blank.",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xjd6ba"
+          },
+          {
+            "id": "ip7omwx",
+            "text": "Thanks. I've been getting multiple of this email (from different sender) since Sunday. I did report it to Amazon as scam. So hopefully they get this taken care off.\n\nThanks again.",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "xjd6ba"
+          }
+        ]
+      },
+      "submission_id": "xjd6ba",
+      "subreddit": "Scams",
+      "title": "New Amazon Scam",
+      "score": 4,
+      "num_comments": 4,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 50,
+          "engagement_level": 4,
+          "karma": 4,
+          "content_length": 31,
+          "indicators": [
+            "Moderate engagement (4+ comments)",
+            "Very short post (<50 chars)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 4,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 4,
+          "reply_ratio": 0,
+          "avg_comment_score": 2,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 3,
+              "text_preview": "I would report that seller to Amazon. It is a sleazy Chinese seller impersonating Amazon to try to g"
+            },
+            {
+              "author": "unknown",
+              "score": 3,
+              "text_preview": "It is a seller (the one that sells the item they link to a review for) but they apparently got bad i"
+            },
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "It's not a seller. Never left a bad review or any reviews. If you take a look at the order informati"
+            }
+          ],
+          "total_comments": 4
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "New Amazon Scam New Amazon Scam  I would report that seller to Amazon"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 0
+        },
+        "discussion_credibility": 38,
+        "avg_comment_credibility": 30,
+        "total_comments_analyzed": 4
+      }
+    },
+    {
+      "similarity_score": 0.523253321647644,
+      "full_doc": {
+        "post": {
+          "id": "xfc9d3",
+          "title": "Is this legit? I did actually purchase and receive the product they mention. The email is a gmail address",
+          "text": "Is this legit? I did actually purchase and receive the product they mention. The email is a gmail address ",
+          "subreddit": "isthisascam",
+          "score": 3,
+          "num_comments": 5
+        },
+        "comments": [
+          {
+            "id": "iom0pkg",
+            "text": "I’ve done one of these before. They are farming reviews for the product and know offering you something in echange will likely net them a positive review. Whether or not the follow though… who knows. Is it a scam? No.",
+            "score": 10,
+            "subreddit": "isthisascam",
+            "parent_id": "xfc9d3"
+          },
+          {
+            "id": "iom1uu1",
+            "text": "Be aware that if you do accept their “offer,” technically the law requires you to disclose with your review that you received an incentive in exchange for your review. I’m also pretty sure this is against Amazon’s policies, and personally I’d consider reporting the merchant to Amazon because this kind of BS is why the reviews on Amazon have become so unreliable. (Or I’d leave an honest review that includes a disclosure statement about the incentive, and if the merchant didn’t follow through with the $15 then I’d report them.)",
+            "score": 8,
+            "subreddit": "isthisascam",
+            "parent_id": "xfc9d3"
+          },
+          {
+            "id": "ioo7wqy",
+            "text": "It happens, however, please be aware that it is against Amazon's ToS. It would be best to report the seller.",
+            "score": 3,
+            "subreddit": "isthisascam",
+            "parent_id": "xfc9d3"
+          },
+          {
+            "id": "ioqhpsd",
+            "text": "It's not a scam, and if you do it they'll probably try to sign you up to \"product test\" but both are against Amazon's Terms of service and they WILL take away your power to review at all if they find out, as well as remove all reviews you have posted.",
+            "score": 2,
+            "subreddit": "isthisascam",
+            "parent_id": "xfc9d3"
+          },
+          {
+            "id": "iolob1u",
+            "text": "I received this in the mail btw, a few days after receiving the product I ordered",
+            "score": 1,
+            "subreddit": "isthisascam",
+            "parent_id": "xfc9d3"
+          }
+        ]
+      },
+      "submission_id": "xfc9d3",
+      "subreddit": "isthisascam",
+      "title": "Is this legit? I did actually purchase and receive the product they mention. The email is a gmail address",
+      "score": 3,
+      "num_comments": 5,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 60,
+          "engagement_level": 5,
+          "karma": 3,
+          "content_length": 211,
+          "indicators": [
+            "Moderate engagement (4+ comments)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 3,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 5,
+          "reply_ratio": 0,
+          "avg_comment_score": 4.8,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 10,
+              "text_preview": "I’ve done one of these before. They are farming reviews for the product and know offering you someth"
+            },
+            {
+              "author": "unknown",
+              "score": 8,
+              "text_preview": "Be aware that if you do accept their “offer,” technically the law requires you to disclose with your"
+            },
+            {
+              "author": "unknown",
+              "score": 3,
+              "text_preview": "It happens, however, please be aware that it is against Amazon's ToS. It would be best to report the"
+            }
+          ],
+          "total_comments": 5
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Is it a scam? No"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [
+            "legit",
+            "reliable"
+          ],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 2
+        },
+        "discussion_credibility": 42.9,
+        "avg_comment_credibility": 33,
+        "total_comments_analyzed": 5
+      }
+    },
+    {
+      "similarity_score": 0.5219112634658813,
+      "full_doc": {
+        "post": {
+          "id": "xr2t25",
+          "title": "Amazon's scam photo proofs 😮‍💨",
+          "text": "Amazon's scam photo proofs 😮‍💨 [deleted]",
+          "subreddit": "indiasocial",
+          "score": 4,
+          "num_comments": 5
+        },
+        "comments": [
+          {
+            "id": "iqcjhi5",
+            "text": "Haven't recieved in there too , lol 😂🤌",
+            "score": 2,
+            "subreddit": "indiasocial",
+            "parent_id": "xr2t25"
+          },
+          {
+            "id": "iqciyp6",
+            "text": "What scam here",
+            "score": 1,
+            "subreddit": "indiasocial",
+            "parent_id": "xr2t25"
+          },
+          {
+            "id": "iqcj1j0",
+            "text": "In Amazon itself they are showing that it hasn't delivered, but i have got mail that the product is delivered and when i asked in app they said me refund will be processed after that i thought Amazon ok i trust Amazon and waited for refund and last month i was checking my bank statement and I'm seeing that no refund was arrived from Amazon so i tried contacting Amazon customer service when i called 1st guy in the morning said refund is processed and even sent the mail you can see the mail which i have attached in this mail ,  2nd guy in the evening said no refund has been processed sir please connect to social media team i was like ok give me the contact and they said i can't give contact sir they will themself contact you and i waited , 3rd guy said within 24hrs they will call i waited i didn't receive any call from your side so i thought of raising query once again in twitter but i don't know why even in twitter they started me to ignore no reply nothing then I started to chat option and you can the image attached a guy / girl came withing one minute she disconnected as i didn't text she didn't even give me time to text and once that done Praveen the social media team contacted me through chat and then he was like sir product is delivered we can't either do anything , now amazon yourself should handle this situation it's not 2000/3000 it's 280000 which I have paid.",
+            "score": 1,
+            "subreddit": "indiasocial",
+            "parent_id": "xr2t25"
+          },
+          {
+            "id": "iqcj7tl",
+            "text": "The mail clearly mentions amazon pay balance why u checking ur bank account",
+            "score": 1,
+            "subreddit": "indiasocial",
+            "parent_id": "xr2t25"
+          },
+          {
+            "id": "iqeuh31",
+            "text": "your email ID is visible publicly",
+            "score": 1,
+            "subreddit": "indiasocial",
+            "parent_id": "xr2t25"
+          }
+        ]
+      },
+      "submission_id": "xr2t25",
+      "subreddit": "indiasocial",
+      "title": "Amazon's scam photo proofs 😮‍💨",
+      "score": 4,
+      "num_comments": 5,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 40,
+          "engagement_level": 5,
+          "karma": 4,
+          "content_length": 70,
+          "indicators": [
+            "Moderate engagement (4+ comments)",
+            "Content removed/deleted"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 4,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 5,
+          "reply_ratio": 0,
+          "avg_comment_score": 1.2,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 2,
+              "text_preview": "Haven't recieved in there too , lol 😂🤌"
+            },
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "What scam here"
+            },
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "In Amazon itself they are showing that it hasn't delivered, but i have got mail that the product is "
+            }
+          ],
+          "total_comments": 5
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Amazon's scam photo proofs 😮‍💨 Amazon's scam photo proofs 😮‍💨 [deleted] Haven't recieved in there too , lol 😂🤌 What scam here In Amazon itself they ar"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 0
+        },
+        "discussion_credibility": 34,
+        "avg_comment_credibility": 30,
+        "total_comments_analyzed": 5
+      }
+    },
+    {
+      "similarity_score": 0.5211586356163025,
+      "full_doc": {
+        "post": {
+          "id": "xfgf1p",
+          "title": "This is a scam, right? Hopefully I wasn't just rude to some new business owner.",
+          "text": "This is a scam, right? Hopefully I wasn't just rude to some new business owner. ",
+          "subreddit": "Aquariums",
+          "score": 5,
+          "num_comments": 16
+        },
+        "comments": [
+          {
+            "id": "iommryy",
+            "text": "This person has you buy Amazon products, you review them and then they pay you for your review.",
+            "score": 10,
+            "subreddit": "Aquariums",
+            "parent_id": "xfgf1p"
+          },
+          {
+            "id": "iomf91d",
+            "text": "The last comment they made. They’re asking for your feedback. Lmao.",
+            "score": 9,
+            "subreddit": "Aquariums",
+            "parent_id": "xfgf1p"
+          },
+          {
+            "id": "iomfef6",
+            "text": "\"How can we improve this scam?\"",
+            "score": 6,
+            "subreddit": "Aquariums",
+            "parent_id": "xfgf1p"
+          },
+          {
+            "id": "ion6i4o",
+            "text": "Even if they were legit they clearly weren't professional, transparent, or reputable. Nothing was gained, but nothing was lost either and that's what's important",
+            "score": 6,
+            "subreddit": "Aquariums",
+            "parent_id": "xfgf1p"
+          },
+          {
+            "id": "iomii9w",
+            "text": "The end goal is to farm fake reviews on Amazon so other people actually buy it.",
+            "score": 5,
+            "subreddit": "Aquariums",
+            "parent_id": "xfgf1p"
+          },
+          {
+            "id": "iomewmc",
+            "text": "I am trying to figure out what is the end goal of this scam.\n\nSo they get your house address and name at least.\n\nWhat can they do with that?\n\nEventually get to asking you for bank details?",
+            "score": 3,
+            "subreddit": "Aquariums",
+            "parent_id": "xfgf1p"
+          },
+          {
+            "id": "ionuz7s",
+            "text": "I would demand an amazon gift card to buy the products.",
+            "score": 3,
+            "subreddit": "Aquariums",
+            "parent_id": "xfgf1p"
+          }
+        ]
+      },
+      "submission_id": "xfgf1p",
+      "subreddit": "Aquariums",
+      "title": "This is a scam, right? Hopefully I wasn't just rude to some new business owner.",
+      "score": 5,
+      "num_comments": 16,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 75,
+          "engagement_level": 16,
+          "karma": 5,
+          "content_length": 159,
+          "indicators": [
+            "High engagement (10+ comments)",
+            "Some upvotes (5+ karma)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 35,
+          "karma_score": 5,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 7,
+          "reply_ratio": 0,
+          "avg_comment_score": 6,
+          "debate_intensity": "low",
+          "consensus_level": "strong_agreement",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 10,
+              "text_preview": "This person has you buy Amazon products, you review them and then they pay you for your review."
+            },
+            {
+              "author": "unknown",
+              "score": 9,
+              "text_preview": "The last comment they made. They’re asking for your feedback. Lmao."
+            },
+            {
+              "author": "unknown",
+              "score": 6,
+              "text_preview": "\"How can we improve this scam?\""
+            }
+          ],
+          "total_comments": 7
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "This is a scam, right? Hopefully I wasn't just rude to some new business owner"
+            },
+            {
+              "keyword": "fake",
+              "context": "Nothing was gained, but nothing was lost either and that's what's important The end goal is to farm fake reviews on Amazon so other people actually bu"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [
+            "legit"
+          ],
+          "scam_mention_count": 2,
+          "warning_count": 0,
+          "positive_count": 1
+        },
+        "discussion_credibility": 50.79,
+        "avg_comment_credibility": 34.29,
+        "total_comments_analyzed": 7
+      }
+    },
+    {
+      "similarity_score": 0.5191881656646729,
+      "full_doc": {
+        "post": {
+          "id": "x65pqm",
+          "title": "is this a scam?",
+          "text": "is this a scam? ",
+          "subreddit": "MiyooMini",
+          "score": 2,
+          "num_comments": 8
+        },
+        "comments": [
+          {
+            "id": "in6qzml",
+            "text": "If there's to good to be true then probably is, you should check the store if they don't have feedback or sales they could be just a scam.",
+            "score": 9,
+            "subreddit": "MiyooMini",
+            "parent_id": "x65pqm"
+          },
+          {
+            "id": "in72fqq",
+            "text": "How about not buying ANYTHING without it having actual customer reviews? It's a good practice, especially in sites like Ali.",
+            "score": 7,
+            "subreddit": "MiyooMini",
+            "parent_id": "x65pqm"
+          },
+          {
+            "id": "in6u8gn",
+            "text": "[deleted]",
+            "score": 5,
+            "subreddit": "MiyooMini",
+            "parent_id": "x65pqm"
+          },
+          {
+            "id": "in7ytzv",
+            "text": "Yes at the end of the title it says gifts, so you get everything except the miyoo mini probably. So be careful",
+            "score": 4,
+            "subreddit": "MiyooMini",
+            "parent_id": "x65pqm"
+          },
+          {
+            "id": "in6ra7g",
+            "text": "I always ask for a picture of the product irl before I buy anything expensive online. And the sellers are always nice to provide.",
+            "score": 3,
+            "subreddit": "MiyooMini",
+            "parent_id": "x65pqm"
+          },
+          {
+            "id": "in8mm9n",
+            "text": "Shoot thanks to late now",
+            "score": 3,
+            "subreddit": "MiyooMini",
+            "parent_id": "x65pqm"
+          },
+          {
+            "id": "in9y7bg",
+            "text": "Yes most likely, also check the shops name and if it's something like \"Shop11948589\" then it is most definitely a scan. There seems to be an increase of these \"Shop\" stores as people are falling for them.",
+            "score": 2,
+            "subreddit": "MiyooMini",
+            "parent_id": "x65pqm"
+          }
+        ]
+      },
+      "submission_id": "x65pqm",
+      "subreddit": "MiyooMini",
+      "title": "is this a scam?",
+      "score": 2,
+      "num_comments": 8,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 55,
+          "engagement_level": 8,
+          "karma": 2,
+          "content_length": 31,
+          "indicators": [
+            "Good engagement (7+ comments)",
+            "Very short post (<50 chars)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 2,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 7,
+          "reply_ratio": 0,
+          "avg_comment_score": 4.71,
+          "debate_intensity": "low",
+          "consensus_level": "strong_agreement",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 9,
+              "text_preview": "If there's to good to be true then probably is, you should check the store if they don't have feedba"
+            },
+            {
+              "author": "unknown",
+              "score": 7,
+              "text_preview": "How about not buying ANYTHING without it having actual customer reviews? It's a good practice, espec"
+            },
+            {
+              "author": "unknown",
+              "score": 5,
+              "text_preview": "[deleted]"
+            }
+          ],
+          "total_comments": 7
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "is this a scam? is this a scam?  If there's to good to be true then probably is, you should check the store if they don't have feedback or sales they "
+            }
+          ],
+          "fraud_indicators": [
+            "be careful"
+          ],
+          "positive_vouches": [],
+          "scam_mention_count": 1,
+          "warning_count": 1,
+          "positive_count": 0
+        },
+        "discussion_credibility": 40.64,
+        "avg_comment_credibility": 32.14,
+        "total_comments_analyzed": 7
+      }
+    },
+    {
+      "similarity_score": 0.518138587474823,
+      "full_doc": {
+        "post": {
+          "id": "xm4fyl",
+          "title": "Is this a scam?",
+          "text": "Is this a scam? ",
+          "subreddit": "AlibabaImport",
+          "score": 4,
+          "num_comments": 1
+        },
+        "comments": [
+          {
+            "id": "ipme2rg",
+            "text": "## **To all participants**\n\nScammer alert - Be VERY cautious of overly helpful company reps and gurus, and especially anyone asking you to privately converse with them, even if what they offer seems helpful or free. These are often attempts to scam / spam / info farm. Do not click links to sites people offer for their services, apps, videos, etc. and especially avoid document links or an unclear url. Report any PMs from scammers / spammers.\n\n## **To those here trying to lead generate / promote / hype** \n\noften consultants, app devs, manufacturers, shippers, and freight forwarders - Attempts to use this sub to drive traffic to something of yours, or otherwise promote, sales pitch, lead generate in any fashion anywhere outside the Community Promotion Post **will result in an irrevocable ban**. The user posts and comments of this sub are NOT the place to hype yourself or what you offer. ***Do not promote, hype yourself, make offers, or ask anyone here to PM / DM / contact you***\n\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/AlibabaImport) if you have any questions or concerns.*",
+            "score": 1,
+            "subreddit": "AlibabaImport",
+            "parent_id": "xm4fyl"
+          }
+        ]
+      },
+      "submission_id": "xm4fyl",
+      "subreddit": "AlibabaImport",
+      "title": "Is this a scam?",
+      "score": 4,
+      "num_comments": 1,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 30,
+          "engagement_level": 1,
+          "karma": 4,
+          "content_length": 31,
+          "indicators": [
+            "Low engagement (<2 comments)",
+            "Very short post (<50 chars)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 4,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 1,
+          "reply_ratio": 0,
+          "avg_comment_score": 1,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 1,
+              "text_preview": "## **To all participants**\n\nScammer alert - Be VERY cautious of overly helpful company reps and guru"
+            }
+          ],
+          "total_comments": 1
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Is this a scam? Is this a scam?  ## **To all participants**\n\nScammer alert - Be VERY cautious of overly helpful company reps and gurus, and especially"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 0
+        },
+        "discussion_credibility": 30,
+        "avg_comment_credibility": 30,
+        "total_comments_analyzed": 1
+      }
+    },
+    {
+      "similarity_score": 0.5170873999595642,
+      "full_doc": {
+        "post": {
+          "id": "xdspal",
+          "title": "Amazon Crypto Scam!",
+          "text": "Amazon Crypto Scam! [removed]",
+          "subreddit": "Scams",
+          "score": 6,
+          "num_comments": 0
+        },
+        "comments": []
+      },
+      "submission_id": "xdspal",
+      "subreddit": "Scams",
+      "title": "Amazon Crypto Scam!",
+      "score": 6,
+      "num_comments": 0,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 15,
+          "engagement_level": 0,
+          "karma": 6,
+          "content_length": 48,
+          "indicators": [
+            "Low engagement (<2 comments)",
+            "Some upvotes (5+ karma)",
+            "Very short post (<50 chars)",
+            "Content removed/deleted"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 35,
+          "karma_score": 6,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 0,
+          "consensus_level": "no_comments",
+          "top_contributors": [],
+          "total_comments": 0
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "Amazon Crypto Scam! Amazon Crypto Scam! [removed]"
+            }
+          ],
+          "fraud_indicators": [],
+          "positive_vouches": [],
+          "scam_mention_count": 1,
+          "warning_count": 0,
+          "positive_count": 0
+        },
+        "discussion_credibility": 16.5,
+        "avg_comment_credibility": 0,
+        "total_comments_analyzed": 0
+      }
+    },
+    {
+      "similarity_score": 0.5143066048622131,
+      "full_doc": {
+        "post": {
+          "id": "x94akl",
+          "title": "is this a scam or not..?",
+          "text": "is this a scam or not..? ",
+          "subreddit": "Scams",
+          "score": 3,
+          "num_comments": 7
+        },
+        "comments": [
+          {
+            "id": "inlsdrm",
+            "text": "Of course, it is a scam. The fact that they even using .org proves this is nothing but a phishing link.",
+            "score": 7,
+            "subreddit": "Scams",
+            "parent_id": "x94akl"
+          },
+          {
+            "id": "inlud4w",
+            "text": "Hi! Etsy sellers will confirm your address if the Etsy system says they can’t verify it with USPS; however, they’ll do that by doing what your Etsy seller did and just ask. You won’t get a text like this from Etsy or USPS - safe to block and ignore. \n\nSource: had my own Etsy shop for awhile, and some people do give an address that can’t be verified",
+            "score": 4,
+            "subreddit": "Scams",
+            "parent_id": "x94akl"
+          },
+          {
+            "id": "inlrnx4",
+            "text": "I’d say scam. Site is less than 2 months old. I wouldn’t be entering my details.",
+            "score": 3,
+            "subreddit": "Scams",
+            "parent_id": "x94akl"
+          },
+          {
+            "id": "inlsxsv",
+            "text": "They bank on people awaiting deliveries given we are a lot of the time. It’s just an odds game to them.",
+            "score": 2,
+            "subreddit": "Scams",
+            "parent_id": "x94akl"
+          },
+          {
+            "id": "inlstht",
+            "text": "thanks, i thought so! an hour before i got this i had an etsy seller ask to confirm my address before shipping my purchase so i thought maybe they wrote it wrong or something",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "x94akl"
+          },
+          {
+            "id": "inm1pmc",
+            "text": "BE CAREFUL! **PHISHING ALERT!** \n\n I'm a bot from Trend Micro and the link getuspspackage.org/ has **Phishing threats**. \n [Check detection detail](https://tmcheck.us/7xM48kJm) \n\n Try Trend Micro Check, a scam detection tool [here](https://api.link.trendmicro.com/events/landing-page?product_id=4cc29&amp;source=reddit_bot&amp;page=phishing&amp;custom_id=t3_x94akl) .\n\nHave feedback about the service? [Contact us](https://tmcheck.us/9UtqnnHp).",
+            "score": 1,
+            "subreddit": "Scams",
+            "parent_id": "x94akl"
+          },
+          {
+            "id": "inlsp6d",
+            "text": "thank you for checking that. an hour before i got this i had an etsy seller ask to confirm my address before shipping my purchase so i thought maybe they wrote it wrong or something!",
+            "score": 0,
+            "subreddit": "Scams",
+            "parent_id": "x94akl"
+          }
+        ]
+      },
+      "submission_id": "x94akl",
+      "subreddit": "Scams",
+      "title": "is this a scam or not..?",
+      "score": 3,
+      "num_comments": 7,
+      "enrichment": {
+        "post_quality": {
+          "quality_score": 55,
+          "engagement_level": 7,
+          "karma": 3,
+          "content_length": 49,
+          "indicators": [
+            "Good engagement (7+ comments)",
+            "Very short post (<50 chars)"
+          ]
+        },
+        "post_author": {
+          "author": "[deleted]",
+          "credibility_score": 30,
+          "karma_score": 3,
+          "red_flags": [
+            "User deleted/removed"
+          ],
+          "is_deleted": true
+        },
+        "thread_analysis": {
+          "thread_depth": 0,
+          "top_level_count": 7,
+          "reply_ratio": 0,
+          "avg_comment_score": 2.57,
+          "debate_intensity": "low",
+          "consensus_level": "mixed",
+          "top_contributors": [
+            {
+              "author": "unknown",
+              "score": 7,
+              "text_preview": "Of course, it is a scam. The fact that they even using .org proves this is nothing but a phishing li"
+            },
+            {
+              "author": "unknown",
+              "score": 4,
+              "text_preview": "Hi! Etsy sellers will confirm your address if the Etsy system says they can’t verify it with USPS; h"
+            },
+            {
+              "author": "unknown",
+              "score": 3,
+              "text_preview": "I’d say scam. Site is less than 2 months old. I wouldn’t be entering my details."
+            }
+          ],
+          "total_comments": 7
+        },
+        "scam_analysis": {
+          "scam_mentions": [
+            {
+              "keyword": "scam",
+              "context": "is this a scam or not"
+            },
+            {
+              "keyword": "phishing",
+              "context": "org proves this is nothing but a phishing link"
+            }
+          ],
+          "fraud_indicators": [
+            "be careful"
+          ],
+          "positive_vouches": [],
+          "scam_mention_count": 2,
+          "warning_count": 1,
+          "positive_count": 0
+        },
+        "discussion_credibility": 39.79,
+        "avg_comment_credibility": 29.29,
+        "total_comments_analyzed": 7
+      }
+    }
+  ],
+  "aggregate_stats": {
+    "total_discussions": 20,
+    "avg_discussion_credibility": 39.01,
+    "avg_post_quality": 51.25,
+    "scam_indicators": {
+      "total_scam_mentions": 27,
+      "total_warnings": 5,
+      "total_positive_vouches": 11,
+      "scam_to_positive_ratio": 2.45
+    },
+    "consensus": {
+      "overall": "mixed_opinions",
+      "strong_agreement": 5,
+      "controversial": 0
+    },
+    "keyword_analysis": {
+      "total_red_flags": 0,
+      "total_green_flags": 2,
+      "keyword_score": 0
+    }
+  },
+  "analysis": {
+    "scam_score": 20,
+    "confidence": 80,
+    "summary": "The discussions analyzed suggest that while there are scam attempts related to Amazon, the platform itself is not a scam. Many users reported suspicious emails or messages but verified their legitimacy through official Amazon channels. The community consensus is mixed, with some discussions leaning towards scam warnings and others confirming the legitimacy of Amazon services.",
+    "red_flags": [
+      "Suspicious emails or messages claiming to be from Amazon",
+      "Phishing attempts to steal personal or financial information",
+      "Unverified sellers or third-party services claiming to represent Amazon"
+    ],
+    "green_flags": [
+      "Amazon's official channels and customer support can verify the legitimacy of communications",
+      "Trust signals such as transparent contact information and terms of service",
+      "Community vigilance and sharing of scam attempts to warn others"
+    ],
+    "key_points": [
+      "Amazon itself is not considered a scam, but there are scam attempts using its name",
+      "Verification through official Amazon channels is crucial for determining legitimacy",
+      "Community consensus is mixed, reflecting both scam warnings and confirmations of Amazon's legitimacy"
+    ],
+    "recommendation": "LOW_RISK",
+    "debate_summary": "The main debate revolves around distinguishing between legitimate Amazon communications and scam attempts. Some discussions focus on identifying phishing emails or messages, while others discuss the importance of verifying information through official Amazon channels.",
+    "reasoning": "The analysis is based on the provided preprocessed data, including discussion credibility, post quality, community consensus, and scam mention counts. The presence of trust signals, such as transparent contact information and terms of service, and the absence of red flags in the keyword analysis, contribute to the low scam score. However, the mixed community consensus and the presence of scam mentions indicate a need for caution and verification of information through official channels.",
+    "preprocessing_insights": {
+      "avg_discussion_credibility": 39.01,
+      "total_scam_mentions": 27,
+      "community_consensus": "mixed_opinions",
+      "keyword_risk_score": 0
+    }
+  }
+}

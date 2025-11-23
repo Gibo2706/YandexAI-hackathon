@@ -1,12 +1,5 @@
 <template>
   <div class="stats" v-if="hasData">
-    <!-- Export Button -->
-    <button @click="exportToPDF" class="export-button" :disabled="isExporting">
-      <i class="fas fa-file-pdf"></i>
-      <span v-if="!isExporting">Export PDF</span>
-      <span v-else>Generating...</span>
-    </button>
-    
     <!-- Hero Section -->
     <div class="hero-section">
       <div class="hero-content">
@@ -41,22 +34,22 @@
     <!-- Stats Grid -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-comments"></i></div>
+        <div class="stat-icon">💬</div>
         <div class="stat-value">{{ data.aggregate_stats.total_discussions }}</div>
         <div class="stat-label">Discussions</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-star"></i></div>
+        <div class="stat-icon">⭐</div>
         <div class="stat-value">{{ avgCredibility }}%</div>
         <div class="stat-label">Avg Credibility</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-icon">📊</div>
         <div class="stat-value">{{ avgQuality }}%</div>
         <div class="stat-label">Avg Quality</div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-balance-scale"></i></div>
+        <div class="stat-icon">⚖️</div>
         <div class="stat-value">{{ scamRatio }}</div>
         <div class="stat-label">Scam/Positive Ratio</div>
       </div>
@@ -66,7 +59,7 @@
     <div class="two-column-layout">
       <div class="findings-section red-flags-section">
         <h2 class="section-title">
-          <span class="title-icon"><i class="fas fa-exclamation-triangle"></i></span>
+          <span class="title-icon">🚨</span>
           Red Flags
         </h2>
         <ul class="findings-list" v-if="data.analysis.red_flags && data.analysis.red_flags.length">
@@ -80,7 +73,7 @@
 
       <div class="findings-section green-flags-section">
         <h2 class="section-title">
-          <span class="title-icon"><i class="fas fa-check-circle"></i></span>
+          <span class="title-icon">✅</span>
           Green Flags
         </h2>
         <ul class="findings-list" v-if="data.analysis.green_flags && data.analysis.green_flags.length">
@@ -156,15 +149,15 @@
           <h3 class="discussion-title">{{ discussion.title }}</h3>
           <div class="discussion-stats">
             <span class="stat-item">
-              <i class="fas fa-comments"></i>
+              <span class="stat-icon">💬</span>
               {{ discussion.num_comments }} comments
             </span>
             <span class="stat-item">
-              <i class="fas fa-star"></i>
+              <span class="stat-icon">⭐</span>
               {{ discussion.enrichment.discussion_credibility.toFixed(1) }}% credibility
             </span>
             <span class="stat-item">
-              <i class="fas fa-chart-bar"></i>
+              <span class="stat-icon">📊</span>
               {{ discussion.enrichment.post_quality.quality_score }}% quality
             </span>
           </div>
@@ -192,51 +185,11 @@
       </div>
     </div>
 
-    <!-- Debate Summary (if available) -->
-    <div class="debate-section" v-if="data.analysis.debate_summary">
-      <h2 class="section-title"><i class="fas fa-balance-scale-right"></i> Community Debate</h2>
-      <div class="debate-card">
-        <p class="debate-text">{{ data.analysis.debate_summary }}</p>
-      </div>
-    </div>
-
-    <!-- Keyword Analysis (if available) -->
-    <div class="keyword-section" v-if="hasKeywordData">
-      <h2 class="section-title"><i class="fas fa-tags"></i> Keyword Analysis</h2>
-      <div class="keyword-stats">
-        <div class="keyword-stat">
-          <span class="keyword-label">Red Flag Keywords</span>
-          <span class="keyword-value danger">{{ data.aggregate_stats.keyword_analysis.total_red_flags }}</span>
-        </div>
-        <div class="keyword-stat">
-          <span class="keyword-label">Green Flag Keywords</span>
-          <span class="keyword-value positive">{{ data.aggregate_stats.keyword_analysis.total_green_flags }}</span>
-        </div>
-        <div class="keyword-stat">
-          <span class="keyword-label">Keyword Score</span>
-          <span class="keyword-value">{{ data.aggregate_stats.keyword_analysis.keyword_score }}</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Reasoning -->
     <div class="reasoning-section">
-      <h2 class="section-title"><i class="fas fa-file-alt"></i> Detailed Analysis</h2>
+      <h2 class="section-title">Detailed Analysis</h2>
       <div class="reasoning-card">
         <p class="reasoning-text">{{ data.analysis.reasoning }}</p>
-      </div>
-    </div>
-
-    <!-- AI Disclaimer -->
-    <div class="disclaimer-section">
-      <div class="disclaimer-card">
-        <h3 class="disclaimer-title"><i class="fas fa-info-circle"></i> Important Disclaimer</h3>
-        <p class="disclaimer-text">
-          This analysis is generated by artificial intelligence based on publicly available Reddit discussions and should be used for informational purposes only. While we strive for accuracy, AI systems can make mistakes, misinterpret context, or miss important nuances. This report does not constitute financial, legal, or professional advice. Always conduct your own research, verify information from multiple sources, and consult with qualified professionals before making any decisions. We are not responsible for any actions taken based on this analysis.
-        </p>
-        <p class="disclaimer-meta">
-          Analysis performed: {{ new Date().toLocaleDateString() }} | Source: Reddit Community Discussions
-        </p>
       </div>
     </div>
 
@@ -252,8 +205,7 @@ export default {
   data() {
     return {
       data: null,
-      hasData: false,
-      isExporting: false
+      hasData: false
     }
   },
   created() {
@@ -343,11 +295,6 @@ export default {
           return scoreB - scoreA
         })
         .slice(0, 5)
-    },
-    hasKeywordData() {
-      return this.data?.aggregate_stats?.keyword_analysis && 
-        (this.data.aggregate_stats.keyword_analysis.total_red_flags > 0 || 
-         this.data.aggregate_stats.keyword_analysis.total_green_flags > 0)
     }
   },
   methods: {
@@ -360,72 +307,6 @@ export default {
     formatConsensus(consensus) {
       if (!consensus) return 'N/A'
       return consensus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-    },
-    async exportToPDF() {
-      this.isExporting = true
-      
-      try {
-        // Dynamically import libraries
-        const html2canvas = (await import('html2canvas')).default
-        const jsPDF = (await import('jspdf')).jsPDF
-        
-        // Get the stats container
-        const element = document.querySelector('.stats')
-        if (!element) {
-          console.error('Stats element not found')
-          return
-        }
-        
-        // Temporarily hide export button and footer for clean PDF
-        const exportBtn = document.querySelector('.export-button')
-        const footer = document.querySelector('.footer')
-        if (exportBtn) exportBtn.style.display = 'none'
-        if (footer) footer.style.display = 'none'
-        
-        // Capture the element as canvas
-        const canvas = await html2canvas(element, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#0a0a0a',
-          logging: false
-        })
-        
-        // Restore hidden elements
-        if (exportBtn) exportBtn.style.display = ''
-        if (footer) footer.style.display = ''
-        
-        // Convert canvas to PDF
-        const imgData = canvas.toDataURL('image/png')
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: 'a4'
-        })
-        
-        const pdfWidth = pdf.internal.pageSize.getWidth()
-        const pdfHeight = pdf.internal.pageSize.getHeight()
-        const imgWidth = canvas.width
-        const imgHeight = canvas.height
-        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight)
-        const imgX = (pdfWidth - imgWidth * ratio) / 2
-        const imgY = 0
-        
-        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio)
-        
-        // Generate filename
-        const query = this.data.query.replace(/[^a-z0-9]/gi, '_').toLowerCase()
-        const date = new Date().toISOString().split('T')[0]
-        const filename = `checkmate_report_${query}_${date}.pdf`
-        
-        pdf.save(filename)
-        
-        console.log('✅ PDF exported successfully:', filename)
-      } catch (error) {
-        console.error('PDF export failed:', error)
-        alert('Failed to export PDF. Please try again.')
-      } finally {
-        this.isExporting = false
-      }
     }
   }
 }
@@ -439,52 +320,6 @@ export default {
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
-  position: relative;
-}
-
-/* Export Button */
-.export-button {
-  position: fixed;
-  top: 2rem;
-  right: 2rem;
-  padding: 0.9rem 1.8rem;
-  background: #FF4500;
-  color: white;
-  border: none;
-  border-radius: 30px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  z-index: 100;
-  box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
-}
-
-.export-button:hover:not(:disabled) {
-  background: #ff6a33;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 69, 0, 0.6);
-}
-
-.export-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.export-button i {
-  font-size: 1.1rem;
-}
-
-@media (max-width: 768px) {
-  .export-button {
-    position: static;
-    width: 100%;
-    margin-bottom: 1rem;
-    justify-content: center;
-  }
 }
 
 /* Hero Section */
@@ -1126,117 +961,6 @@ export default {
   line-height: 1.8;
   font-size: 1.05rem;
   margin: 0;
-}
-
-/* Debate Section */
-.debate-section {
-  margin-bottom: 3rem;
-}
-
-.debate-card {
-  background: #1a1a1a;
-  border: 2px solid #2a2a2a;
-  border-left: 4px solid #EAB308;
-  padding: 2rem;
-}
-
-.debate-text {
-  color: #c0c0c0;
-  line-height: 1.8;
-  font-size: 1.05rem;
-  margin: 0;
-}
-
-/* Keyword Analysis Section */
-.keyword-section {
-  margin-bottom: 3rem;
-}
-
-.keyword-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-
-@media (max-width: 768px) {
-  .keyword-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
-.keyword-stat {
-  background: #1a1a1a;
-  border: 2px solid #2a2a2a;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  align-items: center;
-  text-align: center;
-}
-
-.keyword-label {
-  color: #808080;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 600;
-}
-
-.keyword-value {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #FF4500;
-}
-
-.keyword-value.danger {
-  color: #DC2626;
-}
-
-.keyword-value.positive {
-  color: #16A34A;
-}
-
-/* Disclaimer Section */
-.disclaimer-section {
-  margin-bottom: 3rem;
-}
-
-.disclaimer-card {
-  background: #1a0a0a;
-  border: 2px solid #3a2a2a;
-  border-left: 4px solid #EAB308;
-  padding: 2rem;
-}
-
-.disclaimer-title {
-  color: #EAB308;
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0 0 1rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.disclaimer-title i {
-  font-size: 1.3rem;
-}
-
-.disclaimer-text {
-  color: #b0b0b0;
-  line-height: 1.7;
-  font-size: 0.95rem;
-  margin: 0 0 1rem 0;
-}
-
-.disclaimer-meta {
-  color: #606060;
-  font-size: 0.85rem;
-  font-style: italic;
-  margin: 0;
-  padding-top: 0.75rem;
-  border-top: 1px solid #2a2a2a;
 }
 
 /* Footer */

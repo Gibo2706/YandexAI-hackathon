@@ -32,3 +32,6 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# frontend
+frontend/app/package-lock.json
