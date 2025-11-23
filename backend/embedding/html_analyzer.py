@@ -328,7 +328,6 @@ def build_search_query(extracted_data: Dict[str, Any], company_info: Dict[str, A
         # Traži self-referencing link ili homepage link
         if href.startswith('http'):
             # Extract domain iz URL-a
-            import re
             domain_match = re.search(r'https?://(?:www\.)?([^/]+)', href)
             if domain_match:
                 domain_name = domain_match.group(1)
