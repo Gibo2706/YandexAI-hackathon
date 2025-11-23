@@ -67,7 +67,7 @@ export default {
             k: 20,
             query
           }),
-          credentials: 'include', // include cookies for session management if any
+          //credentials: 'include', // include cookies for session management if any
         })
 
         if (!response.ok) {
