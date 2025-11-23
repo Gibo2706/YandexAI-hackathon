@@ -1,12 +1,12 @@
-name: CI/CD Pipeline
+name: Deploy Pipeline
 
 on:
   push:
     branches:
-      - develop  # Bilo koji push na develop grani pokreće pipeline
+      - develop  # Pokreće pipeline pri svakom pushu na 'develop' granu
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -14,40 +14,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Instalacija zavisnosti i build Backenda
-      - name: Install dependencies and build Backend
-        run: |
-          cd backend
-          git pull origin develop
-          sudo pip install --ignore-installed -r requirements.txt
-          
-      # 3. Restartovanje FastAPI servisa na VM-u putem SSH
-      - name: Restart FastAPI service on VM
+      # 2. Deploy i restart servisa na VM-u putem SSH
+      - name: Deploy and restart services on VM
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.YC_VM_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # 2.1 Pull poslednjih promena u root direktorijumu
+            cd /home/ubuntu/hackathon/YandexAI-hackathon
+            git pull origin develop  # Samo jednom u root folderu
+
+            # 2.2 Backend: Instalacija zavisnosti
+            cd /home/ubuntu/hackathon/YandexAI-hackathon/backend
+            sudo pip install --ignore-installed -r requirements.txt
+            
+            # 2.3 Restartovanje FastAPI servisa
             sudo systemctl restart fastapi.service
+            
+            # 2.4 Frontend: Instalacija zavisnosti i build
+            cd /home/ubuntu/hackathon/YandexAI-hackathon/frontend/app
+            npm install
+            npm run build
 
-      # 4. Instalacija zavisnosti i build Frontenda
-      - name: Install dependencies and build Frontend
-        run: |
-          cd frontend/app
-          git pull origin develop
-          npm install
-          npm run build
-          sudo rm -rf /var/www/frontend/*
-          sudo mkdir /var/www/frontend
-          sudo cp -r dist/* /var/www/frontend/
-
-      # 5. Restartovanje nginx servisa na VM-u putem SSH
-      - name: Restart nginx service on VM
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.YC_VM_IP }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+            # 2.5 Kopiranje build-a na server
+            sudo rm -rf /var/www/frontend/*
+            sudo mkdir -p /var/www/frontend
+            sudo cp -r dist/* /var/www/frontend/
+            
+            # 2.6 Restartovanje nginx servisa
             sudo systemctl restart nginx
