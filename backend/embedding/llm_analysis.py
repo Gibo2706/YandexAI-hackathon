@@ -160,16 +160,12 @@ CONFIDENCE CALCULATION (IMPORTANT):
 - Below 40: Insufficient data (<5 discussions, contradictory signals)
 
 CRITICAL WEIGHTING:
-- Reddit community feedback = 70% weight
-- HTML technical findings = 30% weight
-- PRIORITIZE what real users say over missing contact forms or legal pages
-- Generic HTML issues (missing contact, no terms of service) are MINOR unless Reddit confirms problems
-- Focus on actual user experiences: withdrawal issues, fraud reports, positive reviews
-- Missing legal pages ≠ scam (many legitimate small businesses lack these)
+- Reddit community feedback = 65% weight
+- HTML technical findings = 35% weight
+- Both sources are important - combine them thoughtfully
 - Trust high-credibility discussions more than low-credibility ones
 - Community consensus (strong_agreement vs controversial) is a KEY signal
-- If HTML shows CRITICAL flags ('guaranteed profit', 'ponzi', 'wire transfer only'), increase confidence
-- Subreddit reputation matters (r/scams = high weight, r/investing = moderate)
+- HTML technical findings provide objective data, Reddit provides user experiences
 """
     
     try:

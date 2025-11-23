@@ -83,11 +83,9 @@ def _build_html_context(extracted_data: Dict[str, Any], html_keywords: Dict[str,
     """
     Kreira dodatni kontekst iz HTML-a za Grok LLM.
     Ovo se dodaje uz Reddit diskusije kao DODATNI KONTEKST.
-    
-    Sada uključuje i Reddit stats za bolji confidence calculation.
     """
     context = "\n" + "="*80 + "\n"
-    context += "SUPPLEMENTARY WEBSITE INFO (use as context, not primary evidence):\n"
+    context += "SUPPLEMENTARY WEBSITE INFO (context for analysis):\n"
     context += "="*80 + "\n\n"
     
     # Page info
@@ -96,8 +94,8 @@ def _build_html_context(extracted_data: Dict[str, Any], html_keywords: Dict[str,
         title = title[:100] + "..."
     
     description = extracted_data.get('description', 'N/A')
-    if len(description) > 120:
-        description = description[:120] + "..."
+    if len(description) > 150:
+        description = description[:150] + "..."
     
     context += f"Website: {title}\n"
     if description != 'N/A':
@@ -107,74 +105,35 @@ def _build_html_context(extracted_data: Dict[str, Any], html_keywords: Dict[str,
     # Main headings - pokazuje content structure
     headings = extracted_data.get('headings', [])
     if headings:
-        truncated_headings = [h[:50] for h in headings[:4]]  # Top 4
+        truncated_headings = [h[:60] for h in headings[:6]]  # Top 6
         context += f"Page Headings: {', '.join(truncated_headings)}\n\n"
     
-    # KRITIČNI red flags (tier 1) - stvarne opasnosti
+    # SVE red flags (critical + high risk + suspicious)
     red_flags = html_keywords.get('red_flags', [])
-    critical_flags = [f for f in red_flags if '🚨 CRITICAL' in f]
-    high_risk_flags = [f for f in red_flags if '⚠️ HIGH RISK' in f]
-    
-    # Prikaži kritične + top 3 high risk
-    important_flags = critical_flags[:5] + high_risk_flags[:3]
-    
-    if important_flags:
-        context += f"Website Warning Signs ({len(important_flags)} detected):\n"
-        for flag in important_flags:
-            # Očisti prefix emoji za čitljivost
-            clean_flag = flag.replace('🚨 CRITICAL: ', '').replace('⚠️ HIGH RISK: ', '')
+    if red_flags:
+        context += f"Website Warning Signs ({len(red_flags)} detected):\n"
+        for flag in red_flags[:10]:  # Top 10
+            clean_flag = flag.replace('🚨 CRITICAL: ', '').replace('⚠️ HIGH RISK: ', '').replace('⚠️ SUSPICIOUS: ', '')
             context += f"  • {clean_flag}\n"
         context += "\n"
     
-    # Green flags - top 4
+    # SVE green flags
     green_flags = html_keywords.get('green_flags', [])
     if green_flags:
         context += f"Website Trust Signals ({len(green_flags)} found):\n"
-        for flag in green_flags[:4]:  # Top 4
+        for flag in green_flags[:8]:  # Top 8
             clean_flag = flag.replace('✅ TRUST: ', '')
             context += f"  • {clean_flag}\n"
         context += "\n"
     
-    # Algorithmic score - ali kao REFERENCE, ne definitivno
+    # Algorithmic score
     algo_score = html_keywords.get('algorithmic_score', 0)
-    context += f"Technical Analysis Score: {algo_score}/100 (reference only)\n\n"
+    context += f"Technical Analysis Score: {algo_score}/100\n\n"
     
-    # CONFIDENCE HINTS na osnovu Reddit statistike
-    scam_mentions = reddit_stats.get('scam_indicators', {}).get('total_scam_mentions', 0)
-    positive_vouches = reddit_stats.get('scam_indicators', {}).get('total_positive_vouches', 0)
-    scam_ratio = reddit_stats.get('scam_indicators', {}).get('scam_to_positive_ratio', 0)
-    num_discussions = reddit_stats.get('total_discussions', 0)
-    
-    context += "EVIDENCE QUALITY INDICATORS:\n"
-    context += f"  • {num_discussions} Reddit discussions analyzed\n"
-    context += f"  • Scam mentions: {scam_mentions}, Positive vouches: {positive_vouches}\n"
-    
-    # Pomozi Groku sa confidence reasoning
-    if num_discussions >= 15:
-        if scam_ratio >= 3.0 or scam_mentions >= 15:
-            context += f"  • Strong negative consensus detected (ratio: {scam_ratio:.1f}:1)\n"
-            context += f"  • Confidence should be HIGH (75-90) due to clear pattern\n"
-        elif scam_mentions <= 3 and positive_vouches >= 10:
-            context += f"  • Strong positive consensus detected\n"
-            context += f"  • Confidence should be HIGH (75-90) due to consistent feedback\n"
-        elif scam_ratio > 1.5:
-            context += f"  • Moderate negative trend (ratio: {scam_ratio:.1f}:1)\n"
-            context += f"  • Confidence should be MODERATE (60-74)\n"
-        else:
-            context += f"  • Mixed signals, no clear pattern\n"
-            context += f"  • Confidence should be MODERATE (55-69)\n"
-    elif num_discussions >= 10:
-        context += f"  • Moderate sample size, confidence should be 50-65\n"
-    else:
-        context += f"  • Limited data, confidence should be 40-54\n"
-    
-    context += "\n"
-    context += "⚠️ NOTE: Prioritize Reddit community experiences over technical findings.\n"
-    context += "Missing contact/legal pages are common in small businesses - not automatic red flags.\n"
     context += "="*80 + "\n\n"
     
-    # Safety check - max 2500 chars (~625 tokena)
-    if len(context) > 2500:
-        context = context[:2500] + "\n[Truncated]\n"
+    # Safety check - max 3000 chars
+    if len(context) > 3000:
+        context = context[:3000] + "\n[Truncated]\n"
     
     return context
