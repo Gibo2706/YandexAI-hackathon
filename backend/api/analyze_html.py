@@ -48,7 +48,7 @@ def analyze_html_endpoint(html_content: str, k: int = 20) -> Dict[str, Any]:
         preprocessed = preprocess_reddit_data(search_results, search_query)
         
         # 4. Build HTML context za Grok (additional info)
-        html_context = _build_html_context(extracted_data, html_keywords)
+        html_context = _build_html_context(extracted_data, html_keywords, preprocessed['aggregate_stats'])
         
         # 5. Grok analysis sa HTML kontekstom
         analysis = analyze_with_grok(
@@ -79,10 +79,12 @@ def analyze_html_endpoint(html_content: str, k: int = 20) -> Dict[str, Any]:
         )
 
 
-def _build_html_context(extracted_data: Dict[str, Any], html_keywords: Dict[str, Any]) -> str:
+def _build_html_context(extracted_data: Dict[str, Any], html_keywords: Dict[str, Any], reddit_stats: Dict[str, Any]) -> str:
     """
     Kreira dodatni kontekst iz HTML-a za Grok LLM.
     Ovo se dodaje uz Reddit diskusije kao DODATNI KONTEKST.
+    
+    Sada uključuje i Reddit stats za bolji confidence calculation.
     """
     context = "\n" + "="*80 + "\n"
     context += "SUPPLEMENTARY WEBSITE INFO (use as context, not primary evidence):\n"
@@ -137,12 +139,42 @@ def _build_html_context(extracted_data: Dict[str, Any], html_keywords: Dict[str,
     algo_score = html_keywords.get('algorithmic_score', 0)
     context += f"Technical Analysis Score: {algo_score}/100 (reference only)\n\n"
     
+    # CONFIDENCE HINTS na osnovu Reddit statistike
+    scam_mentions = reddit_stats.get('scam_indicators', {}).get('total_scam_mentions', 0)
+    positive_vouches = reddit_stats.get('scam_indicators', {}).get('total_positive_vouches', 0)
+    scam_ratio = reddit_stats.get('scam_indicators', {}).get('scam_to_positive_ratio', 0)
+    num_discussions = reddit_stats.get('total_discussions', 0)
+    
+    context += "EVIDENCE QUALITY INDICATORS:\n"
+    context += f"  • {num_discussions} Reddit discussions analyzed\n"
+    context += f"  • Scam mentions: {scam_mentions}, Positive vouches: {positive_vouches}\n"
+    
+    # Pomozi Groku sa confidence reasoning
+    if num_discussions >= 15:
+        if scam_ratio >= 3.0 or scam_mentions >= 15:
+            context += f"  • Strong negative consensus detected (ratio: {scam_ratio:.1f}:1)\n"
+            context += f"  • Confidence should be HIGH (75-90) due to clear pattern\n"
+        elif scam_mentions <= 3 and positive_vouches >= 10:
+            context += f"  • Strong positive consensus detected\n"
+            context += f"  • Confidence should be HIGH (75-90) due to consistent feedback\n"
+        elif scam_ratio > 1.5:
+            context += f"  • Moderate negative trend (ratio: {scam_ratio:.1f}:1)\n"
+            context += f"  • Confidence should be MODERATE (60-74)\n"
+        else:
+            context += f"  • Mixed signals, no clear pattern\n"
+            context += f"  • Confidence should be MODERATE (55-69)\n"
+    elif num_discussions >= 10:
+        context += f"  • Moderate sample size, confidence should be 50-65\n"
+    else:
+        context += f"  • Limited data, confidence should be 40-54\n"
+    
+    context += "\n"
     context += "⚠️ NOTE: Prioritize Reddit community experiences over technical findings.\n"
     context += "Missing contact/legal pages are common in small businesses - not automatic red flags.\n"
     context += "="*80 + "\n\n"
     
-    # Safety check - max 2000 chars (~500 tokena)
-    if len(context) > 2000:
-        context = context[:2000] + "\n[Truncated]\n"
+    # Safety check - max 2500 chars (~625 tokena)
+    if len(context) > 2500:
+        context = context[:2500] + "\n[Truncated]\n"
     
     return context
