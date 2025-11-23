@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scam Checker</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Loading State -->
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+    <!-- No Analysis State -->
+    <div id="no-analysis" class="no-analysis" style="display: none;">
+      <div class="header">
+        <img src="../assets/logoP.png" alt="Logo" class="logo">
+        <h1>Scam Checker</h1>
+        <p class="subtitle">Reddit-powered trust analysis</p>
+      </div>
+      
+      <div class="empty-state">
+        <p>No analysis available</p>
+        <p class="hint">Click "Check Page" button on any webpage to analyze it</p>
+      </div>
+      
+      <button id="btn-analyze" class="btn-primary">
+        🔍 Analyze Current Page
+      </button>
+      
+      <button id="btn-clear-storage" class="btn-secondary" style="font-size: 12px; padding: 8px;">
+        🗑️ Clear Storage (Debug)
+      </button>
+    </div>
+
+    <!-- Analysis Results State -->
+    <div id="results" class="results" style="display: none;">
+      <div class="header-small">
+        <img src="../assets/logoP.png" alt="Logo" class="logo-small">
+        <h2 id="domain-name">Analysis Results</h2>
+      </div>
+
+      <!-- Score Card -->
+      <div class="score-card">
+        <div class="score-main">
+          <div id="scam-score" class="score-value">--</div>
+          <div class="score-label">Scam Score</div>
+        </div>
+        <div class="score-sub">
+          <div class="confidence">
+            <span class="label">Confidence</span>
+            <span id="confidence" class="value">--%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="section">
+        <h3>📝 Summary</h3>
+        <p id="summary" class="summary-text">Loading summary...</p>
+      </div>
+
+      <!-- Statistics -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="discussions">--</div>
+          <div class="stat-label">Discussions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="scam-mentions">--</div>
+          <div class="stat-label">Scam Mentions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="positive-vouches">--</div>
+          <div class="stat-label">Positive Vouches</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="avg-credibility">--</div>
+          <div class="stat-label">Avg Credibility</div>
+        </div>
+      </div>
+
+      <!-- Flags -->
+      <div class="flags-section">
+        <div class="flags-column">
+          <h4>🚩 Red Flags</h4>
+          <ul id="red-flags" class="flags-list red">
+            <li>No red flags detected</li>
+          </ul>
+        </div>
+        <div class="flags-column">
+          <h4>✅ Green Flags</h4>
+          <ul id="green-flags" class="flags-list green">
+            <li>No green flags detected</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Recommendation -->
+      <div class="recommendation" id="recommendation">
+        <strong>Recommendation:</strong> <span id="recommendation-text">N/A</span>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button id="btn-reanalyze" class="btn-primary">🔄 Re-analyze</button>
+        <button id="btn-back" class="btn-secondary">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>

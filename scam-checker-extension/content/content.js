@@ -2,6 +2,10 @@
 (function() {
   'use strict';
 
+  console.log('[Scam Checker] 🚀 Content script loaded!');
+  console.log('[Scam Checker] URL:', window.location.href);
+  console.log('[Scam Checker] Document state:', document.readyState);
+
   let floatingButton = null;
   let quickResultsOverlay = null;
   let isAnalyzing = false;
@@ -9,14 +13,29 @@
 
   // Initialize on page load
   function init() {
+    console.log('[Scam Checker] ⚡ init() called');
+    console.log('[Scam Checker] document.body exists:', !!document.body);
+    
     // Always create the button - show on ALL pages
     createFloatingButton();
     setupMessageListener();
+    
+    console.log('[Scam Checker] ✅ Initialization complete');
   }
 
   // Create the floating "Check This Page" button
   function createFloatingButton() {
-    if (floatingButton) return;
+    console.log('[Scam Checker] 🔘 createFloatingButton() called');
+    
+    if (floatingButton) {
+      console.log('[Scam Checker] ⚠️ Button already exists, skipping');
+      return;
+    }
+
+    if (!document.body) {
+      console.error('[Scam Checker] ❌ document.body not available yet');
+      return;
+    }
 
     floatingButton = document.createElement('div');
     floatingButton.id = 'scam-checker-floating-btn';
@@ -33,12 +52,15 @@
       e.stopPropagation();
       hideExtensionCompletely();
     });
+    
     document.body.appendChild(floatingButton);
+    console.log('[Scam Checker] ✅ Button added to DOM');
 
     // Show immediately on ALL pages
     setTimeout(() => {
       if (floatingButton) {
         floatingButton.classList.add('sc-visible');
+        console.log('[Scam Checker] ✅ Button visible');
       }
     }, 1000); // Show after 1 second on ANY page
   }
@@ -197,9 +219,16 @@
       console.log('[Scam Checker] ✅ Showing results...');
       showQuickResults(analysisData);
 
-      // Try to save to storage
+      // Save to storage WITH CURRENT URL
       try {
-        chrome.storage.local.set({ currentPageAnalysis: analysisData });
+        const storageData = {
+          ...analysisData,
+          pageUrl: window.location.href,
+          pageDomain: window.location.hostname,
+          savedAt: Date.now()
+        };
+        await chrome.storage.local.set({ currentPageAnalysis: storageData });
+        console.log('[Scam Checker] ✅ Saved to storage:', storageData.pageUrl);
       } catch (e) {
         console.log('[Scam Checker] Storage error (ignored):', e);
       }
@@ -220,35 +249,61 @@
 
   // Transform API response to extension format
   function transformApiResponse(apiResponse) {
-    console.log('[Scam Checker] Transforming API response...');
-    console.log('[Scam Checker] API response:', apiResponse);
+    console.log('[Scam Checker] ============ TRANSFORMING API RESPONSE ============');
+    console.log('[Scam Checker] Full API response:', apiResponse);
 
-    // Check for combined_verdict (from /analyze-html) or analysis (from /analyze)
-    const combinedVerdict = apiResponse.combined_verdict || {};
-    const analysisObj = apiResponse.analysis || combinedVerdict;
+    const analysis = apiResponse.analysis || {};
     const stats = apiResponse.aggregate_stats || {};
-
-    // Extract confidence (0-1 scale from combined_verdict, or 0-100 from analysis)
-    let confidence = combinedVerdict.confidence || analysisObj.confidence || 0;
-    // Convert to percentage if needed
-    if (confidence <= 1) {
-      confidence = Math.round(confidence * 100);
+    
+    // SAMO ČITAJ ŠTA API VRATI - NE GENERIŠI NIŠTA!
+    let scamScore = analysis.scam_score;
+    let confidence = analysis.confidence;
+    let summary = analysis.summary || '';
+    let recommendation = analysis.recommendation || 'CAUTION';
+    let redFlags = analysis.red_flags || [];
+    let greenFlags = analysis.green_flags || [];
+    
+    console.log('[Scam Checker] Analysis from API:', {
+      scam_score: scamScore,
+      confidence: confidence,
+      recommendation: recommendation,
+      red_flags_count: redFlags.length,
+      green_flags_count: greenFlags.length
+    });
+    
+    // Ako LLM failuje (scam_score = -1), uzmi fallback iz aggregate stats
+    if (scamScore === -1 || scamScore === undefined) {
+      console.log('[Scam Checker] ⚠️ LLM analysis failed, using aggregate stats fallback');
+      const ratio = stats.scam_indicators?.scam_to_positive_ratio || 0;
+      
+      // Jednostavna logika bazirana na ratio
+      if (ratio >= 2.0) scamScore = 75;
+      else if (ratio >= 1.0) scamScore = 55;
+      else if (ratio > 0.5) scamScore = 40;
+      else if (ratio > 0) scamScore = 25;
+      else scamScore = 50;
+      
+      confidence = 50; // Medium confidence kad je fallback
+      summary = `Analysis based on ${stats.total_discussions || 0} Reddit discussions. Scam mentions: ${stats.scam_indicators?.total_scam_mentions || 0}, Positive vouches: ${stats.scam_indicators?.total_positive_vouches || 0}`;
     }
-
-    // Use overall_scam_score from combined_verdict if available, otherwise scam_score from analysis
-    const scamScore = combinedVerdict.overall_scam_score || analysisObj.scam_score || 50;
+    
     const riskScore = Math.min(100, Math.max(0, Math.round(scamScore)));
 
-    console.log('[Scam Checker] Scam score from API:', scamScore);
-    console.log('[Scam Checker] Risk score calculated:', riskScore);
-    console.log('[Scam Checker] Confidence:', confidence);
+    console.log('[Scam Checker] ✅ Final values:', {
+      scamScore,
+      riskScore,
+      confidence,
+      summary: summary.substring(0, 100) + '...'
+    });
 
-    // Extract indicators from red_flags and green_flags
-    const indicators = extractIndicatorsFromAnalysisObject(analysisObj);
 
-    console.log('[Scam Checker] Indicators extracted:', indicators);
+    // Izvuci indicators direktno iz API response
+    const indicators = {
+      positive: greenFlags.map(f => typeof f === 'string' ? f : f.description || f),
+      warning: redFlags.map(f => typeof f === 'string' ? f : f.description || f)
+    };
 
-    // Extract top posts from enriched results
+    // Izvuci top posts iz enriched_results
     const topPosts = (apiResponse.enriched_results || []).slice(0, 5).map(result => ({
       id: result.submission_id || result.id,
       title: result.title,
@@ -258,10 +313,9 @@
       similarity: result.similarity_score || 0
     }));
 
-    // Calculate sentiment from scam_score (lower scam_score = more legit)
-    const scamRatio = scamScore / 100;
-    const legitRatio = 1 - scamRatio;
+    console.log('[Scam Checker] ✅ Transformation complete!');
 
+    // VRATI PODATKE ZA EXTENSION
     return {
       analysisId: `api-${Date.now()}`,
       url: window.location.href,
@@ -269,129 +323,46 @@
       riskScore: riskScore,
       confidence: confidence,
       sentiment: {
-        scam: scamRatio,
-        legit: legitRatio
+        scam: scamScore / 100,
+        legit: 1 - (scamScore / 100)
       },
       metrics: {
         postsAnalyzed: apiResponse.num_discussions_analyzed || 0,
         commentsReviewed: stats.total_discussions || 0,
-        positiveSentiment: Math.round(legitRatio * 100),
-        negativeSentiment: Math.round(scamRatio * 100)
+        positiveSentiment: Math.round((1 - scamScore / 100) * 100),
+        negativeSentiment: Math.round((scamScore / 100) * 100)
       },
       indicators: indicators,
-      riskFactors: generateRiskFactorsFromScore(scamScore, stats),
-      recommendations: generateRecommendations(riskScore),
+      riskFactors: [
+        {
+          severity: scamScore > 60 ? 'HIGH' : scamScore > 30 ? 'MEDIUM' : 'LOW',
+          percentage: scamScore,
+          description: recommendation || (scamScore > 60 ? 'High risk detected' : scamScore > 30 ? 'Mixed signals' : 'Low risk')
+        }
+      ],
+      recommendations: [
+        { type: 'do', text: recommendation || 'Exercise caution' },
+        { type: 'do', text: 'Check Reddit discussions for details' }
+      ],
       redditPosts: topPosts,
-      llmAnalysis: analysisObj.summary || analysisObj.reasoning || 'No analysis available',
+      llmAnalysis: summary,
       aggregateStats: stats,
-      analysisObject: analysisObj,
+      analysisObject: analysis,
       timestamp: new Date().toISOString()
     };
   }
 
-  // Extract indicators from analysis object (new API format)
-  function extractIndicatorsFromAnalysisObject(analysisObj) {
-    const positive = [];
-    const warning = [];
-
-    // Extract green flags (positive indicators)
-    if (analysisObj.green_flags && Array.isArray(analysisObj.green_flags)) {
-      analysisObj.green_flags.forEach(flag => {
-        if (typeof flag === 'string') {
-          positive.push(flag);
-        } else if (flag.description) {
-          positive.push(flag.description);
-        }
-      });
-    }
-
-    // Extract red flags (warning indicators)
-    if (analysisObj.red_flags && Array.isArray(analysisObj.red_flags)) {
-      analysisObj.red_flags.forEach(flag => {
-        if (typeof flag === 'string') {
-          warning.push(flag);
-        } else if (flag.description) {
-          warning.push(flag.description);
-        }
-      });
-    }
-
-    // Defaults if no flags found
-    if (positive.length === 0) {
-      positive.push('Community discussions found', 'Multiple user perspectives available');
-    }
-    if (warning.length === 0) {
-      warning.push('Limited feedback available', 'Proceed with standard caution');
-    }
-
-    return {
-      positive: positive.slice(0, 4),
-      warning: warning.slice(0, 4)
-    };
+  // Helper functions for UI - Risk class and label
+  function getRiskClass(riskScore) {
+    if (riskScore >= 70) return 'sc-risk-high';
+    if (riskScore >= 40) return 'sc-risk-medium';
+    return 'sc-risk-low';
   }
 
-  // Generate risk factors from scam score
-  function generateRiskFactorsFromScore(scamScore, stats) {
-    const factors = [];
-
-    if (scamScore > 60) {
-      factors.push({
-        severity: 'HIGH',
-        percentage: scamScore,
-        description: 'High scam probability detected'
-      });
-    } else if (scamScore > 30) {
-      factors.push({
-        severity: 'MEDIUM',
-        percentage: scamScore,
-        description: 'Mixed signals - exercise caution'
-      });
-    } else {
-      factors.push({
-        severity: 'LOW',
-        percentage: scamScore,
-        description: 'Low risk detected'
-      });
-    }
-
-    // Add scam indicators if present
-    const scamIndicators = stats.scam_indicators || {};
-    if (scamIndicators.total_scam_mentions > 0) {
-      factors.push({
-        severity: 'MEDIUM',
-        percentage: Math.min(100, scamIndicators.total_scam_mentions * 5),
-        description: `${scamIndicators.total_scam_mentions} scam mentions in discussions`
-      });
-    }
-
-    return factors;
-  }
-
-  // Generate recommendations based on risk score
-  function generateRecommendations(riskScore) {
-    const recommendations = [
-      { type: 'do', text: 'Use credit card for payment protection' },
-      { type: 'do', text: 'Research independently before committing' }
-    ];
-
-    if (riskScore > 50) {
-      recommendations.push(
-        { type: 'warning', text: 'High risk detected - proceed with extreme caution' },
-        { type: 'warning', text: 'Consider alternative options' }
-      );
-    } else if (riskScore > 30) {
-      recommendations.push(
-        { type: 'warning', text: 'Mixed reviews - verify credentials carefully' },
-        { type: 'do', text: 'Read recent reviews and experiences' }
-      );
-    } else {
-      recommendations.push(
-        { type: 'do', text: 'Check terms and conditions' },
-        { type: 'do', text: 'Keep records of all transactions' }
-      );
-    }
-
-    return recommendations;
+  function getRiskLabel(riskScore) {
+    if (riskScore >= 70) return 'High Risk';
+    if (riskScore >= 40) return 'Medium Risk';
+    return 'Low Risk';
   }
 
   // Show error message overlay
@@ -466,20 +437,6 @@
     };
   }
 
-  // Helper function to get risk class
-  function getRiskClass(riskScore) {
-    if (riskScore >= 60) return 'high-risk';
-    if (riskScore >= 30) return 'medium-risk';
-    return 'low-risk';
-  }
-
-  // Helper function to get risk label
-  function getRiskLabel(riskScore) {
-    if (riskScore >= 60) return 'HIGH RISK';
-    if (riskScore >= 30) return 'MEDIUM RISK';
-    return 'LOW RISK';
-  }
-
   // Open full analysis in popup
   function openFullAnalysis() {
     chrome.runtime.sendMessage({ action: 'openPopup' });
@@ -508,20 +465,29 @@
 
   // Show quick results overlay
   function showQuickResults(analysisData) {
+    console.log('[Scam Checker] 🎨 showQuickResults called with:', analysisData);
+    
+    // Extract risk score properly
+    const riskScore = analysisData.riskScore || 0;
+    const confidence = analysisData.confidence || 0;
+    
+    console.log('[Scam Checker] 📊 Displaying - Risk:', riskScore, 'Confidence:', confidence);
+    
     // Don't remove existing overlay - just update it if it exists
     if (quickResultsOverlay) {
-      // Update existing overlay content
+      console.log('[Scam Checker] ♻️ Updating existing overlay');
       updateQuickResults(analysisData);
       return;
     }
 
+    console.log('[Scam Checker] ✨ Creating new overlay');
+    
     quickResultsOverlay = document.createElement('div');
     quickResultsOverlay.id = 'scam-checker-quick-results';
     quickResultsOverlay.className = 'sc-overlay';
 
-    const riskClass = getRiskClass(analysisData.riskScore);
-    const riskLabel = getRiskLabel(analysisData.riskScore);
-    const confidence = analysisData.confidence || 0;
+    const riskClass = getRiskClass(riskScore);
+    const riskLabel = getRiskLabel(riskScore);
 
     quickResultsOverlay.innerHTML = `
       <div class="sc-overlay-content">
@@ -536,7 +502,7 @@
           </div>
           
           <div class="sc-risk-score ${riskClass}">
-            <div class="sc-score-value">${analysisData.riskScore}</div>
+            <div class="sc-score-value">${riskScore}</div>
             <div class="sc-score-label">${riskLabel}</div>
           </div>
           
@@ -549,9 +515,13 @@
     `;
 
     document.body.appendChild(quickResultsOverlay);
+    console.log('[Scam Checker] ✅ Overlay added to DOM');
 
     // Animate in
-    setTimeout(() => quickResultsOverlay.classList.add('sc-visible'), 10);
+    setTimeout(() => {
+      quickResultsOverlay.classList.add('sc-visible');
+      console.log('[Scam Checker] ✅ Overlay visible');
+    }, 10);
 
     // Setup event listeners
     document.getElementById('sc-close-overlay').addEventListener('click', closeQuickResults);
@@ -562,9 +532,10 @@
   function updateQuickResults(analysisData) {
     if (!quickResultsOverlay) return;
 
-    const riskClass = getRiskClass(analysisData.riskScore);
-    const riskLabel = getRiskLabel(analysisData.riskScore);
+    const riskScore = analysisData.riskScore || 0;
     const confidence = analysisData.confidence || 0;
+    const riskClass = getRiskClass(riskScore);
+    const riskLabel = getRiskLabel(riskScore);
 
     const collapsibleContent = quickResultsOverlay.querySelector('.sc-overlay-collapsible');
     if (collapsibleContent) {
@@ -574,7 +545,7 @@
         </div>
         
         <div class="sc-risk-score ${riskClass}">
-          <div class="sc-score-value">${analysisData.riskScore}</div>
+          <div class="sc-score-value">${riskScore}</div>
           <div class="sc-score-label">${riskLabel}</div>
         </div>
         

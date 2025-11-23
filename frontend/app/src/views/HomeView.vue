@@ -56,10 +56,14 @@
             <i class="fas fa-puzzle-piece"></i> 
             Install our browser extension for instant Reddit analysis while browsing
           </p>
-          <a href="#" class="extension-button" target="_blank" rel="noopener noreferrer">
+          <a href="/downloads/checkmate-extension-chrome.zip" class="extension-button" download rel="noopener noreferrer">
             <i class="fab fa-chrome"></i>
             Download Extension
           </a>
+          <p class="extension-note">
+            <i class="fas fa-info-circle"></i>
+            After download, go to <strong>chrome://extensions</strong>, enable <strong>Developer mode</strong>, and drag the .zip file to install
+          </p>
         </div>
       </div>
     </div>
@@ -88,6 +92,18 @@ export default {
   },
   mounted() {
     this.loadRecentSearches()
+    
+    // Check for query parameter from extension
+    const urlParams = new URLSearchParams(window.location.search)
+    const queryParam = urlParams.get('q')
+    
+    if (queryParam) {
+      this.prompt = queryParam
+      // Auto-analyze after short delay
+      setTimeout(() => {
+        this.onAnalyzeClick()
+      }, 500)
+    }
   },
   methods: {
     getApiBaseUrl() {
@@ -550,6 +566,23 @@ export default {
 
 .extension-button i {
   font-size: 1.1rem;
+}
+
+.extension-note {
+  color: #808080;
+  font-size: 0.85rem;
+  margin: 1rem 0 0 0;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.extension-note i {
+  color: #FF4500;
+  margin-right: 0.4rem;
+}
+
+.extension-note strong {
+  color: #b0b0b0;
 }
 
 /* Hide extension section on mobile */
