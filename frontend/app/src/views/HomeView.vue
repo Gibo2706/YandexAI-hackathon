@@ -29,9 +29,10 @@
             :key="index"
             @click="selectRecentSearch(search)"
             class="recent-item"
+            :title="search"
           >
             <i class="fas fa-search"></i>
-            {{ search }}
+            {{ truncateText(search, 50) }}
           </button>
         </div>
       </div>
@@ -62,7 +63,7 @@
           </a>
           <p class="extension-note">
             <i class="fas fa-info-circle"></i>
-            After download, go to <strong>chrome://extensions</strong>, enable <strong>Developer mode</strong>, and drag the .zip file to install
+            After download, go to <strong>chrome://extensions</strong>, enable <strong>Developer mode</strong>, and drag extracted folder "checkmate-extension-chrome" to install.
           </p>
         </div>
       </div>
@@ -138,6 +139,13 @@ export default {
     selectRecentSearch(search) {
       this.prompt = search
       this.onAnalyzeClick()
+    },
+    
+    truncateText(text, maxLength) {
+      if (text.length <= maxLength) {
+        return text
+      }
+      return text.substring(0, maxLength) + '...'
     },
     
     getCachedResult(query) {
@@ -398,11 +406,16 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .recent-item i {
   color: #FF4500;
   font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
 .recent-item:hover {
