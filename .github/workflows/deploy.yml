@@ -42,6 +42,11 @@ jobs:
             sudo rm -rf /var/www/frontend/*
             sudo mkdir -p /var/www/frontend
             sudo cp -r dist/* /var/www/frontend/
+
+            # 2.6 Zip scam-checker-extension folder and move to downloads
+            cd ~/hackathon/YandexAI-hackathon
+            zip -r checkmate-extension-chrome.zip scam-checker-extension/*
+            sudo mv checkmate-extension-chrome.zip /var/www/frontend/downloads/
             
-            # 2.6 Restartovanje nginx servisa
+            # 2.7 Restartovanje nginx servisa
             sudo systemctl restart nginx
