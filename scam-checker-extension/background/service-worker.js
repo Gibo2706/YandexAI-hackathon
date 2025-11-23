@@ -1,23 +1,70 @@
 // Background Service Worker - handles API communication
+
+// Keep service worker alive
+let keepAliveInterval;
+
+chrome.runtime.onStartup.addListener(() => {
+  console.log('[Scam Checker BG] Extension startup');
+  startKeepAlive();
+});
+
 chrome.runtime.onInstalled.addListener(() => {
   console.log('[Scam Checker BG] Extension installed');
+  startKeepAlive();
 });
+
+// Keep service worker alive by sending periodic messages
+function startKeepAlive() {
+  if (keepAliveInterval) clearInterval(keepAliveInterval);
+
+  keepAliveInterval = setInterval(() => {
+    chrome.runtime.getPlatformInfo(() => {
+      // Just checking platform keeps worker alive
+      console.log('[Scam Checker BG] Keepalive ping');
+    });
+  }, 20000); // Every 20 seconds
+}
+
+startKeepAlive();
 
 // Listen for messages from content script and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('[Scam Checker BG] Message received:', request.action);
+  console.log('[Scam Checker BG] ========== MESSAGE RECEIVED ==========');
+  console.log('[Scam Checker BG] Action:', request.action);
+  console.log('[Scam Checker BG] Sender tab:', sender.tab?.id);
+  console.log('[Scam Checker BG] Timestamp:', new Date().toISOString());
+
+  // Simple ping test
+  if (request.action === 'ping') {
+    console.log('[Scam Checker BG] Ping received, sending pong...');
+    sendResponse({ success: true, message: 'pong', timestamp: Date.now() });
+    return false; // Synchronous response
+  }
 
   if (request.action === 'analyzeUrl') {
+    console.log('[Scam Checker BG] Starting handleAnalyzeUrl...');
+
+    // Handle async analysis
     handleAnalyzeUrl(request.data)
       .then(result => {
-        console.log('[Scam Checker BG] Sending response:', result);
-        sendResponse(result);
+        console.log('[Scam Checker BG] ✅ Analysis complete, sending response...');
+        console.log('[Scam Checker BG] Response success:', result.success);
+        try {
+          sendResponse(result);
+        } catch (e) {
+          console.error('[Scam Checker BG] Error sending response:', e);
+        }
       })
       .catch(error => {
-        console.error('[Scam Checker BG] Error:', error);
-        sendResponse({ success: false, error: error.message });
+        console.error('[Scam Checker BG] ❌ Error in handleAnalyzeUrl:', error);
+        try {
+          sendResponse({ success: false, error: error.message });
+        } catch (e) {
+          console.error('[Scam Checker BG] Error sending error response:', e);
+        }
       });
-    return true; // Keep channel open for async response
+
+    return true; // CRITICAL: Keep message channel open for async response
   }
 
   if (request.action === 'openPopup') {
@@ -25,191 +72,237 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ success: true });
     return false;
   }
+
+  // Unknown action
+  console.warn('[Scam Checker BG] Unknown action:', request.action);
+  sendResponse({ success: false, error: 'Unknown action' });
+  return false;
 });
 
 // Handle URL analysis
 async function handleAnalyzeUrl(data) {
   console.log('[Scam Checker BG] ========== STARTING ANALYSIS ==========');
   console.log('[Scam Checker BG] Analyzing URL:', data.domain);
-  console.log('[Scam Checker BG] Full data:', JSON.stringify(data, null, 2));
+  console.log('[Scam Checker BG] HTML content length:', data.htmlContent?.length || 0, 'chars');
 
   try {
-    // STEP 1: Call /search endpoint
-    const searchUrl = 'https://www.check-mate.systems/api/search';
-    const searchQuery = `${data.domain} reviews scam legit trustworthy experiences`;
+    // MOCK DATA - simulira /analyze-html response
+    console.log('[Scam Checker BG] Using MOCK data (API not deployed yet)');
 
-    console.log('[Scam Checker BG] Step 1: Calling /search endpoint');
-    console.log('[Scam Checker BG] Search URL:', searchUrl);
-    console.log('[Scam Checker BG] Search query:', searchQuery);
+    const mockResponse = generateMockAnalyzeHtmlResponse(data);
 
-    const searchController = new AbortController();
-    const searchTimeoutId = setTimeout(() => searchController.abort(), 20000);
+    console.log('[Scam Checker BG] ✅ Mock response generated!');
 
-    const searchResponse = await fetch(searchUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: searchQuery,
-        k: 20
-      }),
-      signal: searchController.signal
-    });
-
-    clearTimeout(searchTimeoutId);
-
-    console.log('[Scam Checker BG] Search response status:', searchResponse.status);
-    console.log('[Scam Checker BG] Search response headers:', JSON.stringify([...searchResponse.headers.entries()]));
-
-    if (!searchResponse.ok) {
-      const errorText = await searchResponse.text();
-      console.error('[Scam Checker BG] Search API error response:', errorText);
-      throw new Error(`Search API returned ${searchResponse.status}: ${errorText}`);
-    }
-
-    const searchResults = await searchResponse.json();
-    console.log('[Scam Checker BG] ✅ Search results received!');
-    console.log('[Scam Checker BG] Number of results:', searchResults.length);
-    console.log('[Scam Checker BG] First result sample:', JSON.stringify(searchResults[0], null, 2));
-    console.log('[Scam Checker BG] All search results:', JSON.stringify(searchResults, null, 2));
-
-    if (!searchResults || searchResults.length === 0) {
-      console.warn('[Scam Checker BG] ⚠️ No search results found for query');
-      throw new Error('No search results found');
-    }
-
-    // STEP 2: Call /analyze endpoint with search results
-    const analyzeUrl = 'https://www.check-mate.systems/api/analyze';
-
-    console.log('[Scam Checker BG] Step 2: Calling /analyze endpoint');
-    console.log('[Scam Checker BG] Analyze URL:', analyzeUrl);
-    console.log('[Scam Checker BG] Sending', searchResults.length, 'results to analyze');
-
-    const analyzeController = new AbortController();
-    const analyzeTimeoutId = setTimeout(() => analyzeController.abort(), 30000);
-
-    const analyzeResponse = await fetch(analyzeUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: searchQuery,
-        search_results: searchResults
-      }),
-      signal: analyzeController.signal
-    });
-
-    clearTimeout(analyzeTimeoutId);
-
-    console.log('[Scam Checker BG] Analyze response status:', analyzeResponse.status);
-    console.log('[Scam Checker BG] Analyze response headers:', JSON.stringify([...analyzeResponse.headers.entries()]));
-
-    if (!analyzeResponse.ok) {
-      const errorText = await analyzeResponse.text();
-      console.error('[Scam Checker BG] Analyze API error response:', errorText);
-      throw new Error(`Analyze API returned ${analyzeResponse.status}: ${errorText}`);
-    }
-
-    const analyzeResults = await analyzeResponse.json();
-    console.log('[Scam Checker BG] ✅ Analyze results received!');
-    console.log('[Scam Checker BG] Analysis data:', JSON.stringify(analyzeResults, null, 2));
-
-    // STEP 3: Call /stats endpoint for statistics
-    const statsUrl = 'https://www.check-mate.systems/api/stats';
-
-    console.log('[Scam Checker BG] Step 3: Calling /stats endpoint');
-    console.log('[Scam Checker BG] Stats URL:', statsUrl);
-
-    const statsController = new AbortController();
-    const statsTimeoutId = setTimeout(() => statsController.abort(), 20000);
-
-    const statsResponse = await fetch(statsUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: searchQuery,
-        search_results: searchResults
-      }),
-      signal: statsController.signal
-    });
-
-    clearTimeout(statsTimeoutId);
-
-    console.log('[Scam Checker BG] Stats response status:', statsResponse.status);
-
-    if (!statsResponse.ok) {
-      const errorText = await statsResponse.text();
-      console.error('[Scam Checker BG] Stats API error response:', errorText);
-      throw new Error(`Stats API returned ${statsResponse.status}: ${errorText}`);
-    }
-
-    const statsResults = await statsResponse.json();
-    console.log('[Scam Checker BG] ✅ Stats results received!');
-    console.log('[Scam Checker BG] Statistics data:', JSON.stringify(statsResults, null, 2));
-
-    // STEP 4: Transform combined results
-    console.log('[Scam Checker BG] Step 4: Transforming combined results');
-
-    const transformedData = transformBackendResponse({
-      search_results: searchResults,
-      llm_analysis: analyzeResults.analysis,
-      statistics: statsResults.statistics
-    }, data);
+    // Transform to extension format
+    const transformedData = transformAnalyzeResponse(mockResponse, data);
 
     console.log('[Scam Checker BG] ✅ Transformation complete!');
-    console.log('[Scam Checker BG] Final transformed data:', JSON.stringify(transformedData, null, 2));
+    console.log('[Scam Checker BG] Risk Score:', transformedData.riskScore);
     console.log('[Scam Checker BG] ========== ANALYSIS COMPLETE ==========');
 
     return { success: true, data: transformedData };
 
+    /*
+    // REAL API CALL - aktiviraj kada bude deployovan
+    const analyzeHtmlUrl = 'https://www.check-mate.systems/api/analyze-html';
+
+    console.log('[Scam Checker BG] Calling /analyze-html endpoint');
+    console.log('[Scam Checker BG] URL:', analyzeHtmlUrl);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+    const response = await fetch(analyzeHtmlUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        html_content: data.htmlContent,
+        k: 20
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    console.log('[Scam Checker BG] Response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[Scam Checker BG] API error:', errorText);
+      throw new Error(`API returned ${response.status}: ${errorText}`);
+    }
+
+    const analyzeResults = await response.json();
+    console.log('[Scam Checker BG] ✅ API response received!');
+    console.log('[Scam Checker BG] Response data:', JSON.stringify(analyzeResults, null, 2));
+
+    // Transform API response to extension format
+    const transformedData = transformAnalyzeResponse(analyzeResults, data);
+
+    console.log('[Scam Checker BG] ✅ Transformation complete!');
+    console.log('[Scam Checker BG] Final data:', JSON.stringify(transformedData, null, 2));
+    console.log('[Scam Checker BG] ========== ANALYSIS COMPLETE ==========');
+
+    return { success: true, data: transformedData };
+    */
+
   } catch (error) {
     console.error('[Scam Checker BG] ❌ ERROR:', error);
-    console.error('[Scam Checker BG] Error name:', error.name);
     console.error('[Scam Checker BG] Error message:', error.message);
-    console.error('[Scam Checker BG] Error stack:', error.stack);
 
-    // NO MOCK DATA FALLBACK - show error to user
     throw error;
   }
 }
 
-// Transform backend response to match extension format
-function transformBackendResponse(backendData, requestData) {
-  const stats = backendData.statistics || {};
-  const sentiment = stats.sentiment_indicators || {};
-  const engagement = stats.engagement_stats || {};
+// Generate mock response matching /analyze-html format
+function generateMockAnalyzeHtmlResponse(data) {
+  const domain = data.domain || 'unknown';
 
-  // Calculate risk score based on sentiment
-  const positiveComments = sentiment.positive_comments || 0;
-  const negativeComments = sentiment.negative_comments || 0;
-  const totalComments = sentiment.total_comments || 1;
+  // HARDCODED MOCK DATA - matches exact API format
+  return {
+    query: `${domain} reviews scam legit trustworthy`,
+    num_discussions_analyzed: 15,
+    enriched_results: [
+      {
+        submission_id: "abc123",
+        title: `Is ${domain} legit or a scam?`,
+        subreddit: "Scams",
+        score: 127,
+        num_comments: 45,
+        similarity_score: 0.92,
+        sentiment_label: "negative",
+        keyword_matches: ["scam", "fraud", "warning"]
+      },
+      {
+        submission_id: "def456",
+        title: `My positive experience with ${domain}`,
+        subreddit: "Reviews",
+        score: 89,
+        num_comments: 23,
+        similarity_score: 0.88,
+        sentiment_label: "positive",
+        keyword_matches: ["legit", "trust", "reliable"]
+      },
+      {
+        submission_id: "ghi789",
+        title: `${domain} - mixed reviews, proceed with caution`,
+        subreddit: "PersonalFinance",
+        score: 156,
+        num_comments: 67,
+        similarity_score: 0.85,
+        sentiment_label: "neutral",
+        keyword_matches: ["review", "caution"]
+      },
+      {
+        submission_id: "jkl012",
+        title: `Warning: Issues with ${domain} customer service`,
+        subreddit: "AskReddit",
+        score: 234,
+        num_comments: 89,
+        similarity_score: 0.81,
+        sentiment_label: "negative",
+        keyword_matches: ["warning", "issues", "customer service"]
+      },
+      {
+        submission_id: "mno345",
+        title: `${domain} delivered as promised - happy customer`,
+        subreddit: "Ecommerce",
+        score: 67,
+        num_comments: 12,
+        similarity_score: 0.79,
+        sentiment_label: "positive",
+        keyword_matches: ["legit", "happy", "delivered"]
+      }
+    ],
+    aggregate_stats: {
+      total_discussions: 15,
+      total_comments: 236,
+      avg_post_score: 134.6,
+      avg_comment_score: 4.7,
+      sentiment_distribution: {
+        positive: 98,
+        negative: 118,
+        neutral: 20
+      },
+      keyword_frequency: {
+        "scam": 23,
+        "legit": 15,
+        "trust": 12,
+        "fraud": 8,
+        "reliable": 10,
+        "warning": 19,
+        "caution": 7
+      },
+      top_subreddits: [
+        { subreddit: "Scams", count: 5 },
+        { subreddit: "Reviews", count: 4 },
+        { subreddit: "PersonalFinance", count: 3 },
+        { subreddit: "AskReddit", count: 2 },
+        { subreddit: "Ecommerce", count: 1 }
+      ]
+    },
+    analysis: `Based on 236 Reddit comments analyzing ${domain}:
 
-  const negativeRatio = negativeComments / totalComments;
+**Overall Assessment:** This platform shows mixed signals with notable concerns raised by the community.
+
+**Key Findings:**
+
+✅ **Positive Signals (98 mentions - 42%):**
+- 42% of users report successful transactions
+- Some verified users share positive experiences
+- Product/service delivery confirmed in multiple cases
+- Responsive support mentioned by satisfied customers
+
+⚠️ **Warning Signals (118 mentions - 50%):**
+- 50% of comments express concerns or negative experiences
+- Common complaints: delayed shipping, poor customer service response
+- Multiple users report difficulty obtaining refunds
+- Payment processing issues mentioned in several threads
+- Better Business Bureau complaints referenced
+
+**Community Consensus:**
+The Reddit community leans toward caution. While some users have had positive experiences, a significant portion reports problems. The negative-to-positive ratio suggests elevated risk.
+
+**Risk Level:** MODERATE-HIGH - Exercise caution and use protective measures.
+
+**Recommendations:**
+1. ⚠️ Use credit card or PayPal for buyer protection
+2. 📋 Document all communications and transactions
+3. 🔍 Research recent reviews (within last 6 months)
+4. 💰 Start with small test order if possible
+5. 📞 Verify contact information and customer service availability
+6. ⏰ Check return/refund policy carefully before purchase`
+  };
+}
+
+// Transform /analyze-html response to extension format
+function transformAnalyzeResponse(apiResponse, requestData) {
+  const stats = apiResponse.aggregate_stats || {};
+  const sentiment = stats.sentiment_distribution || { positive: 0, negative: 0 };
+
+  // Calculate risk score
+  const totalSentiment = sentiment.positive + sentiment.negative;
+  const negativeRatio = totalSentiment > 0 ? sentiment.negative / totalSentiment : 0.5;
   const riskScore = Math.min(100, Math.max(0, Math.round(negativeRatio * 100)));
 
-  // Extract top posts from search results
-  const topPosts = (backendData.search_results || []).slice(0, 5).map(result => {
-    const doc = result.full_doc || {};
-    const post = doc.post || {};
-    return {
-      id: post.id || result.submission_id,
-      title: post.title || result.title,
-      subreddit: post.subreddit || result.subreddit,
-      score: post.score || result.score || 0,
-      numComments: post.num_comments || result.num_comments || 0
-    };
-  });
+  // Extract top posts from enriched results
+  const topPosts = (apiResponse.enriched_results || []).slice(0, 5).map(result => ({
+    id: result.submission_id,
+    title: result.title,
+    subreddit: result.subreddit,
+    score: result.score || 0,
+    numComments: result.num_comments || 0,
+    similarity: result.similarity_score
+  }));
 
-  // Extract positive and warning indicators from LLM analysis
-  const llmAnalysis = backendData.llm_analysis || '';
-  const indicators = extractIndicators(llmAnalysis, sentiment);
+  // Extract indicators from LLM analysis
+  const llmAnalysis = apiResponse.analysis || '';
+  const indicators = extractIndicatorsFromAnalysis(llmAnalysis, sentiment);
 
   return {
-    analysisId: `backend-${Date.now()}`,
+    analysisId: `analyze-html-${Date.now()}`,
     url: requestData.url,
     domain: requestData.domain,
     riskScore: riskScore,
@@ -218,81 +311,73 @@ function transformBackendResponse(backendData, requestData) {
       legit: 1 - negativeRatio
     },
     metrics: {
-      postsAnalyzed: stats.total_discussions || 0,
-      commentsReviewed: totalComments,
-      positiveSentiment: Math.round((positiveComments / totalComments) * 100),
-      negativeSentiment: Math.round((negativeComments / totalComments) * 100)
+      postsAnalyzed: apiResponse.num_discussions_analyzed || 0,
+      commentsReviewed: stats.total_comments || 0,
+      positiveSentiment: totalSentiment > 0 ? Math.round((sentiment.positive / totalSentiment) * 100) : 50,
+      negativeSentiment: totalSentiment > 0 ? Math.round((sentiment.negative / totalSentiment) * 100) : 50
     },
     indicators: indicators,
-    riskFactors: generateRiskFactors(sentiment, riskScore),
+    riskFactors: generateRiskFactorsFromSentiment(sentiment, riskScore),
     recommendations: generateRecommendations(riskScore),
     redditPosts: topPosts,
     llmAnalysis: llmAnalysis,
+    aggregateStats: stats,
     timestamp: new Date().toISOString()
   };
 }
 
-// Extract indicators from LLM analysis and sentiment data
-function extractIndicators(llmAnalysis, sentiment) {
+// Extract indicators from LLM analysis text
+function extractIndicatorsFromAnalysis(analysis, sentiment) {
   const positive = [];
   const warning = [];
 
-  const avgPostScore = sentiment.avg_post_score || 0;
-  const avgCommentScore = sentiment.avg_comment_score || 0;
-  const positiveComments = sentiment.positive_comments || 0;
-  const negativeComments = sentiment.negative_comments || 0;
+  const lowerAnalysis = analysis.toLowerCase();
 
-  // Positive indicators
-  if (avgPostScore > 10) {
-    positive.push('High community engagement and upvotes');
-  }
-  if (positiveComments > negativeComments * 2) {
-    positive.push('Majority of comments are positive');
-  }
-  if (avgCommentScore > 5) {
-    positive.push('Well-received community discussions');
-  }
-
-  // Parse LLM analysis for key points
-  if (llmAnalysis.toLowerCase().includes('legit') || llmAnalysis.toLowerCase().includes('trustworthy')) {
-    positive.push('Community indicates legitimacy');
-  }
-  if (llmAnalysis.toLowerCase().includes('good experience') || llmAnalysis.toLowerCase().includes('positive')) {
+  // Parse positive signals from analysis
+  if (lowerAnalysis.includes('positive experiences') || lowerAnalysis.includes('successful transactions')) {
     positive.push('Positive user experiences reported');
   }
-
-  // Warning indicators
-  if (negativeComments > positiveComments) {
-    warning.push('More negative than positive feedback');
+  if (lowerAnalysis.includes('verified users') || lowerAnalysis.includes('legitimate')) {
+    positive.push('Verified community members confirm legitimacy');
   }
-  if (avgPostScore < 5) {
-    warning.push('Low community engagement');
+  if (lowerAnalysis.includes('good customer service') || lowerAnalysis.includes('responsive support')) {
+    positive.push('Responsive customer support mentioned');
   }
-  if (llmAnalysis.toLowerCase().includes('scam') || llmAnalysis.toLowerCase().includes('fraud')) {
-    warning.push('Scam concerns mentioned in discussions');
-  }
-  if (llmAnalysis.toLowerCase().includes('avoid') || llmAnalysis.toLowerCase().includes('warning')) {
-    warning.push('Community warnings detected');
+  if (lowerAnalysis.includes('transparent') || lowerAnalysis.includes('clear terms')) {
+    positive.push('Transparent business practices');
   }
 
-  // Defaults if empty
+  // Parse warning signals from analysis
+  if (lowerAnalysis.includes('concerns') || lowerAnalysis.includes('complaints')) {
+    warning.push('Community concerns detected');
+  }
+  if (lowerAnalysis.includes('refund') || lowerAnalysis.includes('payment delays')) {
+    warning.push('Payment and refund issues reported');
+  }
+  if (lowerAnalysis.includes('customer support') && lowerAnalysis.includes('issue')) {
+    warning.push('Customer support response time concerns');
+  }
+  if (lowerAnalysis.includes('mixed reviews') || lowerAnalysis.includes('divided')) {
+    warning.push('Mixed community opinions');
+  }
+
+  // Defaults
   if (positive.length === 0) {
-    positive.push('Community discussions found', 'Multiple perspectives available');
+    positive.push('Community discussions found', 'Multiple user perspectives available');
   }
   if (warning.length === 0) {
-    warning.push('Limited community feedback', 'Proceed with caution');
+    warning.push('Limited feedback available', 'Proceed with standard caution');
   }
 
-  return { positive, warning };
+  return { positive: positive.slice(0, 4), warning: warning.slice(0, 4) };
 }
 
-// Generate risk factors based on sentiment
-function generateRiskFactors(sentiment, riskScore) {
+// Generate risk factors from sentiment
+function generateRiskFactorsFromSentiment(sentiment, riskScore) {
   const factors = [];
 
-  const negativeComments = sentiment.negative_comments || 0;
-  const totalComments = sentiment.total_comments || 1;
-  const negativePercent = Math.round((negativeComments / totalComments) * 100);
+  const totalSentiment = sentiment.positive + sentiment.negative;
+  const negativePercent = totalSentiment > 0 ? Math.round((sentiment.negative / totalSentiment) * 100) : 50;
 
   if (riskScore > 60) {
     factors.push({
@@ -304,31 +389,25 @@ function generateRiskFactors(sentiment, riskScore) {
     factors.push({
       severity: 'MEDIUM',
       percentage: negativePercent,
-      description: 'Mixed community sentiment detected'
+      description: 'Mixed community sentiment'
+    });
+  } else {
+    factors.push({
+      severity: 'LOW',
+      percentage: negativePercent,
+      description: 'Mostly positive feedback with minor concerns'
     });
   }
 
-  if (sentiment.avg_comment_score < 0) {
+  if (sentiment.negative > 20) {
     factors.push({
       severity: 'MEDIUM',
       percentage: 40,
-      description: 'Below-average comment ratings'
+      description: 'Notable number of negative experiences'
     });
   }
 
-  if (totalComments < 10) {
-    factors.push({
-      severity: 'LOW',
-      percentage: 25,
-      description: 'Limited community discussion available'
-    });
-  }
-
-  return factors.length > 0 ? factors : [{
-    severity: 'LOW',
-    percentage: 20,
-    description: 'General caution recommended'
-  }];
+  return factors;
 }
 
 // Generate recommendations based on risk score

@@ -5,12 +5,13 @@
   let floatingButton = null;
   let quickResultsOverlay = null;
   let isAnalyzing = false;
+  let isOverlayFolded = false;
 
   // Initialize on page load
   function init() {
+    // Always create the button - show on ALL pages
     createFloatingButton();
     setupMessageListener();
-    checkIfEcommerceSite();
   }
 
   // Create the floating "Check This Page" button
@@ -20,19 +21,26 @@
     floatingButton = document.createElement('div');
     floatingButton.id = 'scam-checker-floating-btn';
     floatingButton.innerHTML = `
+      <div class="sc-btn-close-extension" id="sc-btn-close-ext" title="Hide extension temporarily">×</div>
       <div class="sc-btn-content">
         <span class="sc-icon">🛡️</span>
         <span class="sc-text">Check Page</span>
       </div>
     `;
 
-    floatingButton.addEventListener('click', handleCheckPage);
+    floatingButton.querySelector('.sc-btn-content').addEventListener('click', handleCheckPage);
+    floatingButton.querySelector('#sc-btn-close-ext').addEventListener('click', (e) => {
+      e.stopPropagation();
+      hideExtensionCompletely();
+    });
     document.body.appendChild(floatingButton);
 
-    // Show on hover for e-commerce sites
-    if (isEcommerceSite()) {
-      floatingButton.classList.add('sc-visible');
-    }
+    // Show immediately on ALL pages
+    setTimeout(() => {
+      if (floatingButton) {
+        floatingButton.classList.add('sc-visible');
+      }
+    }, 1000); // Show after 1 second on ANY page
   }
 
   // Check if current site is e-commerce related
@@ -40,7 +48,7 @@
     const domain = window.location.hostname.toLowerCase();
     const ecommerceKeywords = [
       'shop', 'store', 'buy', 'cart', 'checkout', 'product',
-      'amazon', 'ebay', 'etsy', 'marketplace',
+      'amazon', 'ebay', 'etsy', 'marketplace', 'temu', 'shein', 'aliexpress', 'wish',
       'kupujem', 'prodajem', 'kupujemprodajem', 'olx', 'njuskalo',
       'polovni', 'oglasi', 'halo', 'limundo'
     ];
@@ -59,80 +67,320 @@
   }
 
   function checkIfEcommerceSite() {
-    if (isEcommerceSite()) {
-      setTimeout(() => {
-        if (floatingButton) {
-          floatingButton.classList.add('sc-visible');
-        }
-      }, 2000);
-    }
+    // No longer needed - button shows everywhere
+    // Keeping function for backwards compatibility
+  }
+
+  // Strip images and heavy content from HTML to reduce size
+  function cleanHtmlContent(htmlString) {
+    // Create temporary DOM parser
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+
+    // Remove all images
+    const images = doc.querySelectorAll('img');
+    images.forEach(img => img.remove());
+
+    // Remove all SVGs (can be large)
+    const svgs = doc.querySelectorAll('svg');
+    svgs.forEach(svg => svg.remove());
+
+    // Remove inline styles with background images
+    const elementsWithStyle = doc.querySelectorAll('[style*="background"]');
+    elementsWithStyle.forEach(el => {
+      const style = el.getAttribute('style');
+      if (style && style.includes('background')) {
+        el.removeAttribute('style');
+      }
+    });
+
+    // Remove picture elements
+    const pictures = doc.querySelectorAll('picture');
+    pictures.forEach(pic => pic.remove());
+
+    // Remove video and audio elements
+    const media = doc.querySelectorAll('video, audio, source');
+    media.forEach(m => m.remove());
+
+    // Remove canvas elements
+    const canvases = doc.querySelectorAll('canvas');
+    canvases.forEach(c => c.remove());
+
+    // Remove iframes (can contain heavy content)
+    const iframes = doc.querySelectorAll('iframe');
+    iframes.forEach(iframe => iframe.remove());
+
+    // Get cleaned HTML
+    return doc.documentElement.outerHTML;
   }
 
   // Handle button click
   async function handleCheckPage() {
     if (isAnalyzing) return;
 
+    console.log('[Scam Checker] ========================================');
     console.log('[Scam Checker] Button clicked, starting analysis...');
+    console.log('[Scam Checker] URL:', window.location.href);
+    console.log('[Scam Checker] Domain:', window.location.hostname);
+
     isAnalyzing = true;
     floatingButton.classList.add('sc-analyzing');
 
     try {
-      // Get page content
-      const pageData = extractPageData();
-      console.log('[Scam Checker] Page data extracted:', pageData);
+      // Extract and clean HTML - remove images and heavy content
+      const fullHtml = document.documentElement.outerHTML;
+      console.log('[Scam Checker] Original HTML size:', fullHtml.length, 'chars');
 
-      // Send to background script for API call
-      chrome.runtime.sendMessage({
-        action: 'analyzeUrl',
-        data: {
-          url: window.location.href,
-          domain: window.location.hostname,
-          content: pageData.content,
-          timestamp: new Date().toISOString()
-        }
-      }, (response) => {
-        if (chrome.runtime.lastError) {
-          console.error('[Scam Checker] Chrome runtime error:', chrome.runtime.lastError);
-          isAnalyzing = false;
-          floatingButton.classList.remove('sc-analyzing');
-          showErrorMessage('Extension error: ' + chrome.runtime.lastError.message);
-          return;
-        }
+      // Clean HTML - remove images, SVGs, videos, etc.
+      const cleanedHtml = cleanHtmlContent(fullHtml);
+      console.log('[Scam Checker] After cleaning (no images):', cleanedHtml.length, 'chars');
 
-        console.log('[Scam Checker] Response received:', response);
-        isAnalyzing = false;
-        floatingButton.classList.remove('sc-analyzing');
+      // LIMIT to 200KB after cleaning
+      const maxHtmlSize = 200000; // 200KB
+      const htmlContent = cleanedHtml.length > maxHtmlSize
+        ? cleanedHtml.substring(0, maxHtmlSize) + '\n<!-- Content truncated -->'
+        : cleanedHtml;
 
-        if (response && response.success) {
-          console.log('[Scam Checker] ✅ Showing results...');
-          showQuickResults(response.data);
-          try {
-            chrome.storage.local.set({ currentPageAnalysis: response.data });
-          } catch (e) {
-            console.log('[Scam Checker] Storage error:', e);
-          }
-        } else {
-          console.error('[Scam Checker] ❌ Analysis failed:', response.error);
-          showErrorMessage(response.error || 'Analysis failed');
-        }
+      console.log('[Scam Checker] Final HTML size to send:', htmlContent.length, 'chars');
+
+      // CALL REAL API
+      console.log('[Scam Checker] Calling API: https://check-mate.systems/api/analyze-html');
+
+      const apiUrl = 'https://check-mate.systems/api/analyze-html';
+      const requestBody = {
+        html_content: htmlContent,
+        k: 20
+      };
+
+      console.log('[Scam Checker] Request payload:', {
+        html_content_length: htmlContent.length,
+        k: 20
       });
 
-      // Timeout fallback
-      setTimeout(() => {
-        if (isAnalyzing) {
-          console.log('[Scam Checker] ⏱️ Timeout - request took too long');
-          isAnalyzing = false;
-          floatingButton.classList.remove('sc-analyzing');
-          showErrorMessage('Analysis timeout - backend may be processing large data');
-        }
-      }, 35000); // 35 second timeout for all 3 API calls
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      console.log('[Scam Checker] API Response status:', response.status);
+      console.log('[Scam Checker] API Response headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[Scam Checker] API Error response:', errorText);
+        throw new Error(`API returned ${response.status}: ${errorText}`);
+      }
+
+      const apiData = await response.json();
+      console.log('[Scam Checker] ✅ API Response received!');
+      console.log('[Scam Checker] API Response data:', apiData);
+
+      // Transform API response to extension format
+      const analysisData = transformApiResponse(apiData);
+      console.log('[Scam Checker] ✅ Data transformed!');
+      console.log('[Scam Checker] Analysis data:', analysisData);
+      console.log('[Scam Checker] Risk Score:', analysisData.riskScore);
+
+      isAnalyzing = false;
+      floatingButton.classList.remove('sc-analyzing');
+
+      // Show results
+      console.log('[Scam Checker] ✅ Showing results...');
+      showQuickResults(analysisData);
+
+      // Try to save to storage
+      try {
+        chrome.storage.local.set({ currentPageAnalysis: analysisData });
+      } catch (e) {
+        console.log('[Scam Checker] Storage error (ignored):', e);
+      }
 
     } catch (error) {
-      console.error('[Scam Checker] Analysis error:', error);
+      console.error('[Scam Checker] ========================================');
+      console.error('[Scam Checker] ERROR:', error);
+      console.error('[Scam Checker] Error type:', error.name);
+      console.error('[Scam Checker] Error message:', error.message);
+      console.error('[Scam Checker] Error stack:', error.stack);
+      console.error('[Scam Checker] ========================================');
+
       isAnalyzing = false;
       floatingButton.classList.remove('sc-analyzing');
       showErrorMessage('Error: ' + error.message);
     }
+  }
+
+  // Transform API response to extension format
+  function transformApiResponse(apiResponse) {
+    console.log('[Scam Checker] Transforming API response...');
+    console.log('[Scam Checker] API analysis object:', apiResponse.analysis);
+
+    const stats = apiResponse.aggregate_stats || {};
+    const analysisObj = apiResponse.analysis || {};
+
+    // Use scam_score from analysis object (0-100 scale)
+    const scamScore = analysisObj.scam_score || 50;
+    const riskScore = Math.min(100, Math.max(0, Math.round(scamScore)));
+
+    console.log('[Scam Checker] Scam score from API:', scamScore);
+    console.log('[Scam Checker] Risk score calculated:', riskScore);
+
+    // Extract indicators from red_flags and green_flags
+    const indicators = extractIndicatorsFromAnalysisObject(analysisObj);
+
+    console.log('[Scam Checker] Indicators extracted:', indicators);
+
+    // Extract top posts from enriched results
+    const topPosts = (apiResponse.enriched_results || []).slice(0, 5).map(result => ({
+      id: result.submission_id || result.id,
+      title: result.title,
+      subreddit: result.subreddit,
+      score: result.score || 0,
+      numComments: result.num_comments || 0,
+      similarity: result.similarity_score || 0
+    }));
+
+    // Calculate sentiment from scam_score (lower scam_score = more legit)
+    const scamRatio = scamScore / 100;
+    const legitRatio = 1 - scamRatio;
+
+    return {
+      analysisId: `api-${Date.now()}`,
+      url: window.location.href,
+      domain: window.location.hostname,
+      riskScore: riskScore,
+      sentiment: {
+        scam: scamRatio,
+        legit: legitRatio
+      },
+      metrics: {
+        postsAnalyzed: apiResponse.num_discussions_analyzed || 0,
+        commentsReviewed: stats.total_discussions || 0,
+        positiveSentiment: Math.round(legitRatio * 100),
+        negativeSentiment: Math.round(scamRatio * 100)
+      },
+      indicators: indicators,
+      riskFactors: generateRiskFactorsFromScore(scamScore, stats),
+      recommendations: generateRecommendations(riskScore),
+      redditPosts: topPosts,
+      llmAnalysis: analysisObj.summary || 'No analysis available',
+      aggregateStats: stats,
+      analysisObject: analysisObj,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // Extract indicators from analysis object (new API format)
+  function extractIndicatorsFromAnalysisObject(analysisObj) {
+    const positive = [];
+    const warning = [];
+
+    // Extract green flags (positive indicators)
+    if (analysisObj.green_flags && Array.isArray(analysisObj.green_flags)) {
+      analysisObj.green_flags.forEach(flag => {
+        if (typeof flag === 'string') {
+          positive.push(flag);
+        } else if (flag.description) {
+          positive.push(flag.description);
+        }
+      });
+    }
+
+    // Extract red flags (warning indicators)
+    if (analysisObj.red_flags && Array.isArray(analysisObj.red_flags)) {
+      analysisObj.red_flags.forEach(flag => {
+        if (typeof flag === 'string') {
+          warning.push(flag);
+        } else if (flag.description) {
+          warning.push(flag.description);
+        }
+      });
+    }
+
+    // Defaults if no flags found
+    if (positive.length === 0) {
+      positive.push('Community discussions found', 'Multiple user perspectives available');
+    }
+    if (warning.length === 0) {
+      warning.push('Limited feedback available', 'Proceed with standard caution');
+    }
+
+    return {
+      positive: positive.slice(0, 4),
+      warning: warning.slice(0, 4)
+    };
+  }
+
+  // Generate risk factors from scam score
+  function generateRiskFactorsFromScore(scamScore, stats) {
+    const factors = [];
+
+    if (scamScore > 60) {
+      factors.push({
+        severity: 'HIGH',
+        percentage: scamScore,
+        description: 'High scam probability detected'
+      });
+    } else if (scamScore > 30) {
+      factors.push({
+        severity: 'MEDIUM',
+        percentage: scamScore,
+        description: 'Mixed signals - exercise caution'
+      });
+    } else {
+      factors.push({
+        severity: 'LOW',
+        percentage: scamScore,
+        description: 'Low risk detected'
+      });
+    }
+
+    // Add scam indicators if present
+    const scamIndicators = stats.scam_indicators || {};
+    if (scamIndicators.total_scam_mentions > 0) {
+      factors.push({
+        severity: 'MEDIUM',
+        percentage: Math.min(100, scamIndicators.total_scam_mentions * 5),
+        description: `${scamIndicators.total_scam_mentions} scam mentions in discussions`
+      });
+    }
+
+    return factors;
+  }
+
+  // Generate recommendations based on risk score
+  function generateRecommendations(riskScore) {
+    const recommendations = [
+      { type: 'do', text: 'Use credit card for payment protection' },
+      { type: 'do', text: 'Research independently before committing' }
+    ];
+
+    if (riskScore > 50) {
+      recommendations.push(
+        { type: 'warning', text: 'High risk detected - proceed with extreme caution' },
+        { type: 'warning', text: 'Consider alternative options' }
+      );
+    } else if (riskScore > 30) {
+      recommendations.push(
+        { type: 'warning', text: 'Mixed reviews - verify credentials carefully' },
+        { type: 'do', text: 'Read recent reviews and experiences' }
+      );
+    } else {
+      recommendations.push(
+        { type: 'do', text: 'Check terms and conditions' },
+        { type: 'do', text: 'Keep records of all transactions' }
+      );
+    }
+
+    return recommendations;
   }
 
   // Show error message overlay
@@ -207,11 +455,53 @@
     };
   }
 
+  // Helper function to get risk class
+  function getRiskClass(riskScore) {
+    if (riskScore >= 60) return 'high-risk';
+    if (riskScore >= 30) return 'medium-risk';
+    return 'low-risk';
+  }
+
+  // Helper function to get risk label
+  function getRiskLabel(riskScore) {
+    if (riskScore >= 60) return 'HIGH RISK';
+    if (riskScore >= 30) return 'MEDIUM RISK';
+    return 'LOW RISK';
+  }
+
+  // Open full analysis in popup
+  function openFullAnalysis() {
+    chrome.runtime.sendMessage({ action: 'openPopup' });
+  }
+
+  // Toggle fold/unfold overlay
+  function toggleOverlayFold() {
+    if (!quickResultsOverlay) return;
+
+    isOverlayFolded = !isOverlayFolded;
+    const content = quickResultsOverlay.querySelector('.sc-overlay-collapsible');
+    const foldBtn = quickResultsOverlay.querySelector('#sc-fold-overlay');
+
+    if (isOverlayFolded) {
+      content.style.display = 'none';
+      foldBtn.innerHTML = '▼';
+      foldBtn.title = 'Unfold';
+      quickResultsOverlay.style.width = '360px';
+    } else {
+      content.style.display = 'block';
+      foldBtn.innerHTML = '▲';
+      foldBtn.title = 'Fold';
+      quickResultsOverlay.style.width = '360px';
+    }
+  }
+
   // Show quick results overlay
   function showQuickResults(analysisData) {
-    // Remove existing overlay
+    // Don't remove existing overlay - just update it if it exists
     if (quickResultsOverlay) {
-      quickResultsOverlay.remove();
+      // Update existing overlay content
+      updateQuickResults(analysisData);
+      return;
     }
 
     quickResultsOverlay = document.createElement('div');
@@ -223,8 +513,79 @@
 
     quickResultsOverlay.innerHTML = `
       <div class="sc-overlay-content">
-        <div class="sc-close-btn" id="sc-close-overlay">×</div>
+        <div class="sc-header-controls">
+          <div class="sc-fold-btn" id="sc-fold-overlay" title="Fold">▲</div>
+          <div class="sc-close-btn" id="sc-close-overlay" title="Close">×</div>
+        </div>
         
+        <div class="sc-overlay-collapsible">
+          <div class="sc-result-header">
+            <div class="sc-logo">🛡️</div>
+            <h3>Page Analysis</h3>
+          </div>
+
+          <div class="sc-risk-score ${riskClass}">
+            <div class="sc-score-value">${analysisData.riskScore}</div>
+            <div class="sc-score-label">${riskLabel}</div>
+          </div>
+
+          <div class="sc-quick-indicators">
+            ${analysisData.indicators.positive.slice(0, 2).map(item => `
+              <div class="sc-indicator positive">
+                <span class="sc-ind-icon">✓</span>
+                <span class="sc-ind-text">${item}</span>
+              </div>
+            `).join('')}
+            ${analysisData.indicators.warning.slice(0, 2).map(item => `
+              <div class="sc-indicator warning">
+                <span class="sc-ind-icon">⚠</span>
+                <span class="sc-ind-text">${item}</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <button class="sc-view-full-btn" id="sc-view-full">View Full Analysis</button>
+
+          <button class="sc-hide-extension-btn" id="sc-hide-extension" style="
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+          ">
+            Hide Extension on This Page
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(quickResultsOverlay);
+
+    // Animate in
+    setTimeout(() => quickResultsOverlay.classList.add('sc-visible'), 10);
+
+    // Setup event listeners
+    document.getElementById('sc-close-overlay').addEventListener('click', closeQuickResults);
+    document.getElementById('sc-fold-overlay').addEventListener('click', toggleOverlayFold);
+    document.getElementById('sc-view-full').addEventListener('click', openFullAnalysis);
+    document.getElementById('sc-hide-extension').addEventListener('click', hideExtensionOnPage);
+  }
+
+  // Update existing overlay with new data
+  function updateQuickResults(analysisData) {
+    if (!quickResultsOverlay) return;
+
+    const riskClass = getRiskClass(analysisData.riskScore);
+    const riskLabel = getRiskLabel(analysisData.riskScore);
+
+    const collapsibleContent = quickResultsOverlay.querySelector('.sc-overlay-collapsible');
+    if (collapsibleContent) {
+      collapsibleContent.innerHTML = `
         <div class="sc-result-header">
           <div class="sc-logo">🛡️</div>
           <h3>Page Analysis</h3>
@@ -252,30 +613,34 @@
 
         <button class="sc-view-full-btn" id="sc-view-full">View Full Analysis</button>
 
-        <div class="sc-timer-bar">
-          <div class="sc-timer-fill"></div>
-        </div>
-      </div>
-    `;
+        <button class="sc-hide-extension-btn" id="sc-hide-extension" style="
+          width: 100%;
+          margin-top: 10px;
+          padding: 10px;
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          color: rgba(255,255,255,0.7);
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 12px;
+          transition: all 0.2s;
+        ">
+          Hide Extension on This Page
+        </button>
+      `;
 
-    document.body.appendChild(quickResultsOverlay);
+      // Re-attach event listeners
+      document.getElementById('sc-view-full').addEventListener('click', openFullAnalysis);
+      document.getElementById('sc-hide-extension').addEventListener('click', hideExtensionOnPage);
+    }
 
-    // Animate in
-    setTimeout(() => quickResultsOverlay.classList.add('sc-visible'), 10);
-
-    // Setup event listeners
-    document.getElementById('sc-close-overlay').addEventListener('click', closeQuickResults);
-    document.getElementById('sc-view-full').addEventListener('click', openFullAnalysis);
-
-    // Auto-dismiss after 7 seconds
-    const timerFill = quickResultsOverlay.querySelector('.sc-timer-fill');
-    timerFill.style.animation = 'sc-timer-progress 7s linear forwards';
-
-    setTimeout(() => {
-      closeQuickResults();
-    }, 7000);
+    // Show overlay if it was hidden
+    if (!quickResultsOverlay.classList.contains('sc-visible')) {
+      setTimeout(() => quickResultsOverlay.classList.add('sc-visible'), 10);
+    }
   }
 
+  // Close quick results overlay
   function closeQuickResults() {
     if (quickResultsOverlay) {
       quickResultsOverlay.classList.remove('sc-visible');
@@ -288,22 +653,60 @@
     }
   }
 
-  function openFullAnalysis() {
+  function hideExtensionOnPage() {
+    // Close overlay first
     closeQuickResults();
-    // Open extension popup (this will be handled by clicking the extension icon)
-    chrome.runtime.sendMessage({ action: 'openPopup' });
+
+    // Hide floating button
+    if (floatingButton) {
+      floatingButton.classList.remove('sc-visible');
+      floatingButton.style.display = 'none';
+    }
+
+    // Save preference to not show on this domain
+    try {
+      const domain = window.location.hostname;
+      chrome.storage.local.get(['hiddenDomains'], (result) => {
+        const hiddenDomains = result.hiddenDomains || [];
+        if (!hiddenDomains.includes(domain)) {
+          hiddenDomains.push(domain);
+          chrome.storage.local.set({ hiddenDomains: hiddenDomains });
+          console.log('[Scam Checker] Extension hidden on domain:', domain);
+        }
+      });
+    } catch (e) {
+      console.error('[Scam Checker] Error saving hidden domain:', e);
+    }
   }
 
-  function getRiskClass(score) {
-    if (score >= 70) return 'high-risk';
-    if (score >= 40) return 'medium-risk';
-    return 'low-risk';
-  }
+  // Completely hide extension on current page (temporarily - will return on page reload)
+  function hideExtensionCompletely() {
+    console.log('[Scam Checker] Hiding extension temporarily (will return on page reload)');
 
-  function getRiskLabel(score) {
-    if (score >= 70) return 'High Risk';
-    if (score >= 40) return 'Medium Risk';
-    return 'Low Risk';
+    // Close overlay if open
+    if (quickResultsOverlay) {
+      quickResultsOverlay.classList.remove('sc-visible');
+      setTimeout(() => {
+        if (quickResultsOverlay) {
+          quickResultsOverlay.remove();
+          quickResultsOverlay = null;
+        }
+      }, 300);
+    }
+
+    // Hide and remove floating button
+    if (floatingButton) {
+      floatingButton.classList.remove('sc-visible');
+      setTimeout(() => {
+        if (floatingButton) {
+          floatingButton.remove();
+          floatingButton = null;
+        }
+      }, 300);
+    }
+
+    // DO NOT save to storage - user can reload page to get it back
+    console.log('[Scam Checker] Extension hidden temporarily. Reload page to show again.');
   }
 
   // Setup message listener for popup communication
@@ -316,20 +719,6 @@
       return true;
     });
   }
-
-  // Mock analysis data - COMMENTED OUT, NO LONGER USED
-  /*
-  function getMockAnalysis() {
-    const domain = window.location.hostname;
-    return {
-      analysisId: `mock-${Date.now()}`,
-      url: window.location.href,
-      domain: domain,
-      riskScore: Math.floor(Math.random() * 40) + 20,
-      // ... rest of mock data
-    };
-  }
-  */
 
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
