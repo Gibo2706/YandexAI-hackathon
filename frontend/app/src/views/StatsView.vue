@@ -6,28 +6,7 @@
     </div>
     
     <!-- Key Metrics Cards -->
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-icon">📊</div>
-        <div class="metric-value">{{ redditData.length }}</div>
-        <div class="metric-label">Posts Analyzed</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon">💬</div>
-        <div class="metric-value">{{ totalComments }}</div>
-        <div class="metric-label">Comments Reviewed</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon">📈</div>
-        <div class="metric-value">{{ (sentimentData.legit * 100).toFixed(0) }}%</div>
-        <div class="metric-label">Positive Sentiment</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon">⚠️</div>
-        <div class="metric-value">{{ (sentimentData.scam * 100).toFixed(0) }}%</div>
-        <div class="metric-label">Negative Sentiment</div>
-      </div>
-    </div>
+    <KeyMetrics :metrics="metrics" :sentiment="sentimentData" />
 
     <!-- External API Results Section -->
     <div v-if="externalApi" class="external-api-section">
@@ -272,44 +251,7 @@
     </div>
 
     <!-- Top Posts Section - Full Width -->
-    <div class="top-posts-section">
-      <h2>Top Reddit Discussions</h2>
-      <p class="section-description">Most discussed posts about Kiwi.com on Reddit</p>
-      
-      <div class="reddit-posts">
-        <div v-for="(item, index) in topPosts" :key="index" class="post-card">
-          <div class="post-rank">{{ index + 1 }}</div>
-          <div class="post-header">
-            <span class="subreddit">r/{{ item.post.subreddit }}</span>
-            <div class="post-stats">
-              <span class="post-stat">
-                <span class="stat-icon">▲</span>
-                {{ item.post.score }}
-              </span>
-              <span class="post-stat">
-                <span class="stat-icon">💬</span>
-                {{ item.post.num_comments }}
-              </span>
-            </div>
-          </div>
-          <h3>{{ item.post.title }}</h3>
-          <p class="post-text">{{ item.post.text }}</p>
-          
-          <div class="comments-section">
-            <div class="comments-header">
-              <h4>Top Comments</h4>
-              <span class="comments-count">{{ item.comments.length }} comments</span>
-            </div>
-            <div v-for="(comment, cIndex) in item.comments" :key="cIndex" class="comment" :class="{ 'negative': comment.score < 0, 'positive': comment.score > 0 }">
-              <div class="comment-score-badge" :class="{ 'score-negative': comment.score < 0, 'score-positive': comment.score > 0 }">
-                {{ comment.score > 0 ? '+' : '' }}{{ comment.score }}
-              </div>
-              <p class="comment-text">{{ comment.text }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <TopPosts :posts="topPosts" :prompt="prompt" />
 
     <footer class="footer">
       <p>&copy; 2025 The Sthrokaders | AI NATION Hackathon by Yandex & Reputeo</p>
@@ -318,6 +260,8 @@
 </template>
 
 <script>
+import KeyMetrics from '@/components/Stats/KeyMetrics.vue'
+import TopPosts from '@/components/Stats/TopPosts.vue'
 import redditData, { 
   getSentimentPercentages, 
   getAnalysisMetrics,
@@ -332,9 +276,16 @@ import redditData, {
 
 export default {
   name: 'StatsView',
+  components: {
+    KeyMetrics,
+    TopPosts
+  },
   data() {
     return {
       prompt: this.$route.query.prompt || 'Kiwi.com',
+      // backend data
+      backendResponse: null,
+      // derived UI data
       redditData: redditData,
       sentimentData: getSentimentPercentages(),
       metrics: getAnalysisMetrics(),
@@ -344,7 +295,24 @@ export default {
       wordAnalysis: getWordAnalysis(),
       recommendations: getRecommendations(),
       externalApi: getExternalApiResults(),
-      technicalChecks: getTechnicalChecks()
+      technicalChecks: getTechnicalChecks(),
+      isLoading: false,
+      loadError: null
+    }
+  },
+  created() {
+    // Try to read response passed from HomeView via history.state (Vue Router 4)
+    const navState = window.history.state && window.history.state.analyzeResponse
+    console.log('[StatsView] created, history.state:', window.history.state)
+    if (navState) {
+      console.log('[StatsView] Received analyzeResponse from navigation:', navState)
+      this.backendResponse = navState
+      this.mapBackendToUi(navState)
+    } else {
+      // If we landed here via direct link/refresh, optionally re-call backend
+      // For now, keep mock data and show gentle info message
+      this.loadError = null
+      console.log('[StatsView] No backend response in navigation state, using mock data')
     }
   },
   computed: {
@@ -358,6 +326,130 @@ export default {
     }
   },
   methods: {
+    mapBackendToUi(response) {
+      // Response follows AnalyzeResponse from API_STRUCTURES_FINAL.md
+      try {
+        console.log('[StatsView] Mapping backend response to UI...', response)
+        const enriched = Array.isArray(response.enriched_results) ? response.enriched_results : []
+        const stats = response.aggregate_stats || {}
+        const analysis = response.analysis || {}
+
+        // Map to simple sentiment percentages from scam_score or scam mentions
+        const scamScore = typeof analysis.scam_score === 'number' ? analysis.scam_score : 0
+        const scam = Math.min(Math.max(scamScore / 100, 0), 1)
+        const legit = 1 - scam
+        this.sentimentData = { scam, legit }
+  console.log('[StatsView] sentimentData set to:', this.sentimentData)
+
+        // Map metrics
+        const totalPosts = enriched.length
+        const totalComments = enriched.reduce((sum, item) => {
+          const ta = item.enrichment && item.enrichment.thread_analysis
+          return sum + (ta && typeof ta.total_comments === 'number' ? ta.total_comments : 0)
+        }, 0)
+
+        this.metrics = {
+          totalPosts,
+          totalComments,
+          dateRange: 'Reddit history',
+          confidence: typeof analysis.confidence === 'number' ? analysis.confidence : 0
+        }
+        console.log('[StatsView] metrics derived from backend:', this.metrics)
+
+        // Key indicators from flags
+        const redFlags = Array.isArray(analysis.red_flags) ? analysis.red_flags : []
+        const greenFlags = Array.isArray(analysis.green_flags) ? analysis.green_flags : []
+        this.keyIndicators = {
+          positive: greenFlags.map(text => ({ text, icon: '✓' })),
+          warnings: redFlags.map(text => ({ text, icon: '⚠' }))
+        }
+        console.log('[StatsView] keyIndicators:', this.keyIndicators)
+
+        // Risk factors from scam score and scam indicators
+        const scamIndicators = (stats && stats.scam_indicators) || {}
+        const totalScam = scamIndicators.total_scam_mentions || 0
+        const totalWarnings = scamIndicators.total_warnings || 0
+
+        this.riskFactors = [
+          {
+            level: scamScore >= 75 ? 'high' : scamScore >= 35 ? 'medium' : 'medium',
+            text: 'Scam risk based on community reports',
+            percentage: Math.round(scamScore || 0),
+            color: '#e74c3c'
+          },
+          {
+            level: 'medium',
+            text: `Warning phrases detected in discussions (${totalWarnings})`,
+            percentage: Math.min(totalWarnings * 10, 100),
+            color: '#f39c12'
+          },
+          {
+            level: 'medium',
+            text: `Total scam mentions across threads (${totalScam})`,
+            percentage: Math.min(totalScam * 8, 100),
+            color: '#f39c12'
+          }
+        ]
+        console.log('[StatsView] riskFactors:', this.riskFactors)
+
+        // Recommendations from analysis.recommendation + key_points
+        const recs = []
+        if (analysis.recommendation) {
+          recs.push({
+            type: ['AVOID', 'HIGH_CAUTION'].includes(analysis.recommendation) ? 'priority' : 'caution',
+            text: `Overall recommendation: ${analysis.recommendation}`,
+            icon: ['AVOID', 'HIGH_CAUTION'].includes(analysis.recommendation) ? '⚠' : '✓'
+          })
+        }
+        const keyPoints = Array.isArray(analysis.key_points) ? analysis.key_points : []
+        keyPoints.slice(0, 4).forEach(text => {
+          recs.push({ type: 'caution', text, icon: '⚠' })
+        })
+        this.recommendations = recs.length ? recs : getRecommendations()
+        console.log('[StatsView] recommendations:', this.recommendations)
+
+        // redditData mapping for Top Reddit Discussions
+        if (enriched.length) {
+          this.redditData = enriched.map(item => {
+            const meta = item.metadata || {}
+            const enrichment = item.enrichment || {}
+            const post = {
+              id: meta.submission_id || meta.id || '',
+              title: meta.title || '',
+              text: item.text || '',
+              subreddit: meta.subreddit || 'unknown',
+              score: typeof meta.score === 'number' ? meta.score : 0,
+              num_comments: typeof meta.num_comments === 'number' ? meta.num_comments : (enrichment.thread_analysis && enrichment.thread_analysis.total_comments) || 0
+            }
+
+            const scamAnalysis = enrichment.scam_analysis || {}
+            const comments = []
+            const positiveVouches = Array.isArray(scamAnalysis.positive_vouches) ? scamAnalysis.positive_vouches : []
+            const fraudIndicators = Array.isArray(scamAnalysis.fraud_indicators) ? scamAnalysis.fraud_indicators : []
+
+            positiveVouches.forEach(text => {
+              comments.push({ id: `pos-${text}`, text, score: 1, subreddit: post.subreddit })
+            })
+            fraudIndicators.forEach(text => {
+              comments.push({ id: `neg-${text}`, text, score: -1, subreddit: post.subreddit })
+            })
+
+            return { post, comments }
+          })
+          console.log('[StatsView] redditData mapped from enriched_results (sample):', this.redditData[0])
+        }
+
+        // externalApi & technicalChecks are still mock (no external APIs yet)
+        this.externalApi = getExternalApiResults()
+        this.technicalChecks = getTechnicalChecks()
+
+        this.loadError = null
+        console.log('[StatsView] Mapping complete. UI state ready.')
+      } catch (e) {
+        console.error('Error mapping backend response to UI', e)
+        this.loadError = 'There was a problem displaying the analysis. Showing demo data instead.'
+      }
+    },
     polarToCartesian(centerX, centerY, radius, angleInDegrees) {
       const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
       return {

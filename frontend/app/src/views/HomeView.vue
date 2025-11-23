@@ -1,5 +1,10 @@
 <template>
   <div class="home">
+    <div v-if="isLoading" class="global-loader-overlay">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">Analyzing Reddit... Please wait</div>
+    </div>
+
     <div class="content-wrapper">
       <div class="logo-container">
         <img alt="Reddit logo" src="../assets/logoP.png" class="logo">
@@ -18,8 +23,9 @@
             class="search-bar"
           />
         </div>
-        <button @click="goToStats" class="check-button">
-          <span>Analyze</span>
+        <button @click="onAnalyzeClick" class="check-button" :disabled="isLoading">
+          <span v-if="!isLoading">Analyze</span>
+          <span v-else>Analyzing...</span>
         </button>
       </div>
     </div>
@@ -35,15 +41,56 @@ export default {
   name: 'HomeView',
   data() {
     return {
-      prompt: ''
+      prompt: '',
+      isLoading: false
     }
   },
   methods: {
-    goToStats() {
-      this.$router.push({
-        name: 'stats',
-        query: { prompt: this.prompt || 'Kiwi.com' }
-      })
+    getApiBaseUrl() {
+      // Vue CLI exposes env vars prefixed with VUE_APP_
+      const base = process.env.VUE_APP_API_BASE_URL || '/api'
+      // Ensure no trailing slash to make joining paths predictable
+      return base.replace(/\/$/, '')
+    },
+    async onAnalyzeClick() {
+      const query = this.prompt && this.prompt.trim().length > 0 ? this.prompt.trim() : 'Kiwi.com'
+
+      this.isLoading = true
+      try {
+        const baseUrl = this.getApiBaseUrl()
+        const response = await fetch(`${baseUrl}/analyze`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            k: 20,
+            query
+          }),
+          //credentials: 'include', // include cookies for session management if any
+        })
+
+        if (!response.ok) {
+          console.error('Analyze request failed', await response.text())
+          // Fallback: still navigate so StatsView can handle absence of data / show mock
+        }
+
+        const data = await response.json().catch(() => null)
+
+        this.$router.push({
+          name: 'stats',
+          query: { prompt: query },
+          state: data ? { analyzeResponse: data } : undefined
+        })
+      } catch (err) {
+        console.error('Analyze request error', err)
+        this.$router.push({
+          name: 'stats',
+          query: { prompt: query }
+        })
+      } finally {
+        this.isLoading = false
+      }
     }
   }
 }
@@ -60,6 +107,34 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+.global-loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loader-spinner {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #FF4500;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.loader-text {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 .content-wrapper {
@@ -235,6 +310,11 @@ export default {
   .description {
     font-size: 0.85rem;
   }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .footer {
