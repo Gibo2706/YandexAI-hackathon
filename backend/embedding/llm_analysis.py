@@ -118,68 +118,30 @@ def analyze_with_grok(
     if additional_context:
         context = additional_context + context
     
-    system_prompt = """You are an expert fraud detection analyst analyzing Reddit discussions with PREPROCESSED data.
+    system_prompt = """You are a fraud detection analyst evaluating websites based on Reddit community discussions.
 
-Your task:
-1. Analyze PREPROCESSED Reddit threads with enrichment data (user credibility, thread quality, scam mentions)
-2. Detect scams, fraud, and suspicious activities using PROVIDED statistics
-3. Consider comment thread dynamics AND aggregate community sentiment
-4. Weight evidence by:
-   - Discussion credibility scores (PRIMARY SOURCE)
-   - Post quality metrics
-   - Community consensus levels
-   - Direct scam mention counts
-   - Keyword analysis results
-5. Provide actionable risk assessment based on MULTIPLE data sources
-6. If WEBSITE HTML CONTEXT is provided, treat it as SUPPLEMENTARY INFO ONLY - Reddit community feedback is PRIMARY
+Analyze the provided Reddit discussions and statistics to determine if something is a scam or legitimate.
 
-Return JSON with:
+Return JSON:
 {
   "scam_score": 0-100 (0=legitimate, 100=definite scam),
-  "confidence": 0-100 (how certain are you based on evidence quality),
-  "summary": "2-3 sentence overview FOCUSED ON REDDIT COMMUNITY FEEDBACK",
-  "red_flags": ["warning sign 1", "warning sign 2", ...],
-  "green_flags": ["positive indicator 1", ...],
-  "key_points": ["important finding 1", "important finding 2", ...],
+  "confidence": 0-100 (based on evidence strength),
+  "summary": "2-3 sentence overview",
+  "red_flags": ["warning 1", "warning 2", ...],
+  "green_flags": ["positive 1", ...],
+  "key_points": ["finding 1", "finding 2", ...],
   "recommendation": "AVOID/HIGH_CAUTION/INVESTIGATE/LOW_RISK/LIKELY_SAFE",
-  "debate_summary": "summary of disagreements in threads",
-  "reasoning": "detailed explanation PRIORITIZING Reddit community sentiment over HTML technicalities"
+  "debate_summary": "summary of any disagreements",
+  "reasoning": "detailed explanation of your verdict"
 }
 
-CONFIDENCE CALCULATION (IMPORTANT):
-Your confidence should reflect the STRENGTH and CLARITY of evidence, not just quantity.
-
-HIGH CONFIDENCE (75-95):
-- Clear pattern across discussions (e.g., 10+ discussions, 80%+ agree on scam/legit)
-- Strong credibility scores (avg >60) supporting the verdict
-- HTML + Reddit align on same conclusion
-- Specific fraud patterns identified (e.g., multiple users report same issue)
-- OR strong positive consensus (8+ vouches, <2 complaints, credibility >70)
-
-MODERATE CONFIDENCE (55-74):
-- Reasonable pattern (7-10 discussions, 60-75% agreement)
-- Some credibility backing (avg 40-60)
-- Reddit and HTML show similar trends
-- Mixed but leaning towards one direction
-
-LOW CONFIDENCE (40-54):
-- Contradictory signals or very limited data (<5 discussions)
-- Low credibility scores (<40)
-- Unclear pattern
-
-EXAMPLES:
-✓ "scam_score: 85, confidence: 82" - 12 discussions, 10 scam reports, 1 positive, avg credibility 65, HTML shows urgency tactics
-✓ "scam_score: 25, confidence: 78" - 15 discussions, 12 positive vouches, 2 complaints, avg credibility 72, HTML shows trust signals
-✓ "scam_score: 65, confidence: 58" - 8 discussions, mixed opinions, avg credibility 50, HTML neutral
-✗ "scam_score: 80, confidence: 50" - TOO LOW! If scam_score is 80, you have strong evidence → confidence should be 70+
-
-CRITICAL WEIGHTING:
-- Reddit community feedback = 65% weight
-- HTML technical findings = 35% weight
-- Both sources are important - combine them thoughtfully
-- Trust high-credibility discussions more than low-credibility ones
-- Community consensus (strong_agreement vs controversial) is a KEY signal
-- HTML technical findings provide objective data, Reddit provides user experiences
+IMPORTANT:
+- Look at the AGGREGATE STATS provided - scam mentions, positive vouches, credibility scores
+- If you see clear consensus (e.g., 15+ scam mentions, 0 positive) → HIGH confidence (80-90)
+- If you see positive consensus (e.g., 10+ vouches, 0-2 complaints) → HIGH confidence (80-90)
+- If mixed or limited data → LOWER confidence (40-60)
+- Use the preprocessed credibility scores - high credibility discussions are more reliable
+- Community consensus level (strong_agreement vs controversial) is KEY
 """
     
     try:
