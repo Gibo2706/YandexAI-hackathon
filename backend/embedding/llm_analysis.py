@@ -147,17 +147,31 @@ Return JSON with:
 }
 
 CONFIDENCE CALCULATION (IMPORTANT):
-- 85-100: Strong consensus (20+ discussions, clear pattern, high credibility)
-  Example: 15+ scam mentions, <3 positive vouches, avg credibility >60
-  Example: 0-2 scam mentions, 10+ positive vouches, avg credibility >70
-- 70-84: Good evidence (15-20 discussions, consistent feedback)
-  Example: 10+ scam mentions, scam-to-positive ratio >3.0
-  Example: <5 scam mentions, positive experiences dominant
-- 55-69: Moderate evidence (10-15 discussions, some consistency)
-  Example: Mixed opinions but pattern emerging
-- 40-54: Limited evidence (5-10 discussions, unclear pattern)
-  Example: Equal scam/positive mentions, low sample size
-- Below 40: Insufficient data (<5 discussions, contradictory signals)
+Your confidence should reflect the STRENGTH and CLARITY of evidence, not just quantity.
+
+HIGH CONFIDENCE (75-95):
+- Clear pattern across discussions (e.g., 10+ discussions, 80%+ agree on scam/legit)
+- Strong credibility scores (avg >60) supporting the verdict
+- HTML + Reddit align on same conclusion
+- Specific fraud patterns identified (e.g., multiple users report same issue)
+- OR strong positive consensus (8+ vouches, <2 complaints, credibility >70)
+
+MODERATE CONFIDENCE (55-74):
+- Reasonable pattern (7-10 discussions, 60-75% agreement)
+- Some credibility backing (avg 40-60)
+- Reddit and HTML show similar trends
+- Mixed but leaning towards one direction
+
+LOW CONFIDENCE (40-54):
+- Contradictory signals or very limited data (<5 discussions)
+- Low credibility scores (<40)
+- Unclear pattern
+
+EXAMPLES:
+✓ "scam_score: 85, confidence: 82" - 12 discussions, 10 scam reports, 1 positive, avg credibility 65, HTML shows urgency tactics
+✓ "scam_score: 25, confidence: 78" - 15 discussions, 12 positive vouches, 2 complaints, avg credibility 72, HTML shows trust signals
+✓ "scam_score: 65, confidence: 58" - 8 discussions, mixed opinions, avg credibility 50, HTML neutral
+✗ "scam_score: 80, confidence: 50" - TOO LOW! If scam_score is 80, you have strong evidence → confidence should be 70+
 
 CRITICAL WEIGHTING:
 - Reddit community feedback = 65% weight
