@@ -23,7 +23,7 @@
     floatingButton.innerHTML = `
       <div class="sc-btn-close-extension" id="sc-btn-close-ext" title="Hide extension temporarily">×</div>
       <div class="sc-btn-content">
-        <span class="sc-icon">🛡️</span>
+        <img src="${chrome.runtime.getURL('assets/logoP.png')}" class="sc-icon-img" alt="CheckMate Logo">
         <span class="sc-text">Check Page</span>
       </div>
     `;
@@ -221,17 +221,27 @@
   // Transform API response to extension format
   function transformApiResponse(apiResponse) {
     console.log('[Scam Checker] Transforming API response...');
-    console.log('[Scam Checker] API analysis object:', apiResponse.analysis);
+    console.log('[Scam Checker] API response:', apiResponse);
 
+    // Check for combined_verdict (from /analyze-html) or analysis (from /analyze)
+    const combinedVerdict = apiResponse.combined_verdict || {};
+    const analysisObj = apiResponse.analysis || combinedVerdict;
     const stats = apiResponse.aggregate_stats || {};
-    const analysisObj = apiResponse.analysis || {};
 
-    // Use scam_score from analysis object (0-100 scale)
-    const scamScore = analysisObj.scam_score || 50;
+    // Extract confidence (0-1 scale from combined_verdict, or 0-100 from analysis)
+    let confidence = combinedVerdict.confidence || analysisObj.confidence || 0;
+    // Convert to percentage if needed
+    if (confidence <= 1) {
+      confidence = Math.round(confidence * 100);
+    }
+
+    // Use overall_scam_score from combined_verdict if available, otherwise scam_score from analysis
+    const scamScore = combinedVerdict.overall_scam_score || analysisObj.scam_score || 50;
     const riskScore = Math.min(100, Math.max(0, Math.round(scamScore)));
 
     console.log('[Scam Checker] Scam score from API:', scamScore);
     console.log('[Scam Checker] Risk score calculated:', riskScore);
+    console.log('[Scam Checker] Confidence:', confidence);
 
     // Extract indicators from red_flags and green_flags
     const indicators = extractIndicatorsFromAnalysisObject(analysisObj);
@@ -257,6 +267,7 @@
       url: window.location.href,
       domain: window.location.hostname,
       riskScore: riskScore,
+      confidence: confidence,
       sentiment: {
         scam: scamRatio,
         legit: legitRatio
@@ -271,7 +282,7 @@
       riskFactors: generateRiskFactorsFromScore(scamScore, stats),
       recommendations: generateRecommendations(riskScore),
       redditPosts: topPosts,
-      llmAnalysis: analysisObj.summary || 'No analysis available',
+      llmAnalysis: analysisObj.summary || analysisObj.reasoning || 'No analysis available',
       aggregateStats: stats,
       analysisObject: analysisObj,
       timestamp: new Date().toISOString()
@@ -510,6 +521,7 @@
 
     const riskClass = getRiskClass(analysisData.riskScore);
     const riskLabel = getRiskLabel(analysisData.riskScore);
+    const confidence = analysisData.confidence || 0;
 
     quickResultsOverlay.innerHTML = `
       <div class="sc-overlay-content">
@@ -519,47 +531,19 @@
         </div>
         
         <div class="sc-overlay-collapsible">
-          <div class="sc-result-header">
-            <div class="sc-logo">🛡️</div>
-            <h3>Page Analysis</h3>
+          <div class="sc-logo-container">
+            <img src="${chrome.runtime.getURL('assets/logoP.png')}" class="sc-overlay-logo" alt="CheckMate Logo">
           </div>
-
+          
           <div class="sc-risk-score ${riskClass}">
             <div class="sc-score-value">${analysisData.riskScore}</div>
             <div class="sc-score-label">${riskLabel}</div>
           </div>
-
-          <div class="sc-quick-indicators">
-            ${analysisData.indicators.positive.slice(0, 2).map(item => `
-              <div class="sc-indicator positive">
-                <span class="sc-ind-icon">✓</span>
-                <span class="sc-ind-text">${item}</span>
-              </div>
-            `).join('')}
-            ${analysisData.indicators.warning.slice(0, 2).map(item => `
-              <div class="sc-indicator warning">
-                <span class="sc-ind-icon">⚠</span>
-                <span class="sc-ind-text">${item}</span>
-              </div>
-            `).join('')}
+          
+          <div class="sc-confidence-container">
+            <div class="sc-confidence-label">Confidence</div>
+            <div class="sc-confidence-value">${confidence}%</div>
           </div>
-
-          <button class="sc-view-full-btn" id="sc-view-full">View Full Analysis</button>
-
-          <button class="sc-hide-extension-btn" id="sc-hide-extension" style="
-            width: 100%;
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.7);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
-          ">
-            Hide Extension on This Page
-          </button>
         </div>
       </div>
     `;
@@ -572,8 +556,6 @@
     // Setup event listeners
     document.getElementById('sc-close-overlay').addEventListener('click', closeQuickResults);
     document.getElementById('sc-fold-overlay').addEventListener('click', toggleOverlayFold);
-    document.getElementById('sc-view-full').addEventListener('click', openFullAnalysis);
-    document.getElementById('sc-hide-extension').addEventListener('click', hideExtensionOnPage);
   }
 
   // Update existing overlay with new data
@@ -582,56 +564,25 @@
 
     const riskClass = getRiskClass(analysisData.riskScore);
     const riskLabel = getRiskLabel(analysisData.riskScore);
+    const confidence = analysisData.confidence || 0;
 
     const collapsibleContent = quickResultsOverlay.querySelector('.sc-overlay-collapsible');
     if (collapsibleContent) {
       collapsibleContent.innerHTML = `
-        <div class="sc-result-header">
-          <div class="sc-logo">🛡️</div>
-          <h3>Page Analysis</h3>
+        <div class="sc-logo-container">
+          <img src="${chrome.runtime.getURL('assets/logoP.png')}" class="sc-overlay-logo" alt="CheckMate Logo">
         </div>
-
+        
         <div class="sc-risk-score ${riskClass}">
           <div class="sc-score-value">${analysisData.riskScore}</div>
           <div class="sc-score-label">${riskLabel}</div>
         </div>
-
-        <div class="sc-quick-indicators">
-          ${analysisData.indicators.positive.slice(0, 2).map(item => `
-            <div class="sc-indicator positive">
-              <span class="sc-ind-icon">✓</span>
-              <span class="sc-ind-text">${item}</span>
-            </div>
-          `).join('')}
-          ${analysisData.indicators.warning.slice(0, 2).map(item => `
-            <div class="sc-indicator warning">
-              <span class="sc-ind-icon">⚠</span>
-              <span class="sc-ind-text">${item}</span>
-            </div>
-          `).join('')}
+        
+        <div class="sc-confidence-container">
+          <div class="sc-confidence-label">Confidence</div>
+          <div class="sc-confidence-value">${confidence}%</div>
         </div>
-
-        <button class="sc-view-full-btn" id="sc-view-full">View Full Analysis</button>
-
-        <button class="sc-hide-extension-btn" id="sc-hide-extension" style="
-          width: 100%;
-          margin-top: 10px;
-          padding: 10px;
-          background: rgba(255,255,255,0.1);
-          border: 1px solid rgba(255,255,255,0.2);
-          color: rgba(255,255,255,0.7);
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 12px;
-          transition: all 0.2s;
-        ">
-          Hide Extension on This Page
-        </button>
       `;
-
-      // Re-attach event listeners
-      document.getElementById('sc-view-full').addEventListener('click', openFullAnalysis);
-      document.getElementById('sc-hide-extension').addEventListener('click', hideExtensionOnPage);
     }
 
     // Show overlay if it was hidden

@@ -82,6 +82,13 @@
   gap: 8px;
 }
 
+/* Logo image in floating button */
+.sc-icon-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
 .sc-icon {
   font-size: 18px;
   line-height: 1;
@@ -203,12 +210,24 @@
   letter-spacing: -0.5px;
 }
 
+/* Logo container in overlay */
+.sc-logo-container {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.sc-overlay-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
 /* Risk Score */
 .sc-risk-score {
   text-align: center;
   padding: 20px;
   border-radius: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   border: 2px solid;
   position: relative;
   overflow: hidden;
@@ -281,6 +300,30 @@
   color: #ffffff;
   position: relative;
   z-index: 1;
+}
+
+/* Confidence Level Display */
+.sc-confidence-container {
+  text-align: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.sc-confidence-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.sc-confidence-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
 }
 
 /* Quick Indicators */
