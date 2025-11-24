@@ -7,12 +7,13 @@ from .preprocessing import preprocess_for_analysis
 
 load_dotenv()
 
-grok_client = OpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
-    base_url="https://api.groq.com/openai/v1"
+# OpenAI client and model configuration
+# NOTE: We keep function name analyze_with_grok for backward compatibility, but it now uses OpenAI.
+openai_client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 
-GROK_MODEL = "llama-3.3-70b-versatile"
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
 
 
 def truncate_text(text: str, max_chars: int = 500) -> str:
@@ -148,8 +149,8 @@ IMPORTANT:
         # Proceni veličinu konteksta (približno 4 chars = 1 token)
         estimated_tokens = len(context) / 4
         
-        # LIMIT: Groq API ima ~8K token context window, ostavi marginu
-        MAX_TOKENS = 6000  # Safe limit sa marginom za response
+        # LIMIT: OpenAI gpt-4o ima veliki prozor (~128K); ostavi konzervativnu marginu
+        MAX_TOKENS = 80000  # Safe limit sa marginom za response
         
         # Ako je kontekst prevelik, podeli na 2 dela i analiziraj odvojeno
         if estimated_tokens > MAX_TOKENS:
@@ -157,8 +158,8 @@ IMPORTANT:
             
             # Analiza prvog dela
             context_part1 = prepare_analysis_context(query, search_results[:mid_point])
-            response1 = grok_client.chat.completions.create(
-                model=GROK_MODEL,
+            response1 = openai_client.chat.completions.create(
+                model=OPENAI_MODEL,
                 messages=[
                     {"role": "system", "content": system_prompt + "\n\nNote: This is PART 1 of 2. Analyze these discussions and provide preliminary findings."},
                     {"role": "user", "content": context_part1}
@@ -182,8 +183,8 @@ Now analyze PART 2 and provide a FINAL assessment considering both parts:
 """
             
             context_part2 = prepare_analysis_context(query, search_results[mid_point:])
-            response2 = grok_client.chat.completions.create(
-                model=GROK_MODEL,
+            response2 = openai_client.chat.completions.create(
+                model=OPENAI_MODEL,
                 messages=[
                     {"role": "system", "content": system_prompt + "\n\nNote: This is PART 2 of 2. You have context from Part 1. Provide FINAL analysis combining both parts."},
                     {"role": "user", "content": part1_summary + "\n" + context_part2}
@@ -202,8 +203,8 @@ Now analyze PART 2 and provide a FINAL assessment considering both parts:
             return result2
         
         # Ako je kontekst OK veličine, uradi normalnu analizu
-        response = grok_client.chat.completions.create(
-            model=GROK_MODEL,
+        response = openai_client.chat.completions.create(
+            model=OPENAI_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": context}
